@@ -340,7 +340,7 @@ export default function MaterialsAestheticsStep({ form }: MaterialsAestheticsSte
               </FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder='e.g. "I want it to feel like my old 6\'2\" thruster but with more paddle power"'
+                  placeholder={`e.g. "I want it to feel like my old 6'2" thruster but with more paddle power"`}
                   className="rounded-xl border-border bg-secondary/50 text-heading min-h-[90px] resize-none"
                   {...field}
                 />
