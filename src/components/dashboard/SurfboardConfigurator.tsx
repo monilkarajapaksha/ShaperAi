@@ -36,11 +36,11 @@ export default function SurfboardConfigurator({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [originalBoardData, setOriginalBoardData] = useState<any>(null);
   const [parameters, setParameters] = useState({
-    length: suggestion?.length || 180, // cm
-    width: suggestion?.width || 50, // cm
-    thickness: suggestion?.thickness || 6, // cm
-    noseWidth: suggestion?.noseWidth || 30, // cm
-    tailWidth: suggestion?.tailWidth || 35, // cm
+    length: suggestion?.length || 6.5,     // ft
+    width: suggestion?.width || 21.0,      // inches
+    thickness: suggestion?.thickness || 2.75, // inches
+    noseWidth: suggestion?.noseWidth || 14.5, // inches
+    tailWidth: suggestion?.tailWidth || 16.0, // inches
   });
 
   const [boardVolume, setBoardVolume] = useState<number | null>(
@@ -186,7 +186,7 @@ export default function SurfboardConfigurator({
         boardLength: parameters.length,
         boardWidth: parameters.width,
         boardThickness: parameters.thickness,
-        boardType: parameters.length > 210 ? "longboard" : "shortboard", // basic heuristic
+        boardType: parameters.length > 8 ? "longboard" : "shortboard",
       };
 
       const refinedConfig = await boardReconfigurationService.reconfigure({
@@ -333,11 +333,11 @@ export default function SurfboardConfigurator({
                   </thead>
                   <tbody className="divide-y divide-white/5">
                      {[
-                       { label: 'Length', val: parameters.length, tol: '± 1"' },
-                       { label: 'Width', val: parameters.width, tol: '± 0.5"' },
-                       { label: 'Thickness', val: parameters.thickness, tol: '± 0.25"', isDecimal: true },
-                       { label: 'Nose Width', val: parameters.noseWidth, tol: '± 0.5"', isDecimal: true },
-                       { label: 'Tail Width', val: parameters.tailWidth, tol: '± 0.5"', isDecimal: true },
+                       { label: 'Length', val: parameters.length, unit: 'ft', tol: '± 0.08 ft' },
+                       { label: 'Width', val: parameters.width, unit: '"', tol: '± 0.5"' },
+                       { label: 'Thickness', val: parameters.thickness, unit: '"', tol: '± 0.25"' },
+                       { label: 'Nose Width', val: parameters.noseWidth, unit: '"', tol: '± 0.5"' },
+                       { label: 'Tail Width', val: parameters.tailWidth, unit: '"', tol: '± 0.5"' },
                      ].map((item) => (
                        <tr key={item.label} className="hover:bg-white/5 transition-colors">
                          <td className="p-3 text-heading">{item.label}</td>
@@ -345,7 +345,7 @@ export default function SurfboardConfigurator({
                            {isRefining ? (
                              <div className="h-4 w-12 bg-secondary animate-pulse rounded" />
                            ) : (
-                             `${item.isDecimal ? (item.val / 2.54).toFixed(1) : Math.round(item.val / 2.54)}"`
+                             `${item.val.toFixed(2)} ${item.unit}`
                            )}
                          </td>
                          <td className="p-3 text-muted-foreground opacity-70">{item.tol}</td>
@@ -377,13 +377,13 @@ export default function SurfboardConfigurator({
                  <div className="bg-secondary/30 rounded-xl p-4 text-center border border-white/5">
                    <div className="text-xs text-muted-foreground mb-1">Volume</div>
                    <div className="text-2xl font-bold text-primary font-mono">
-                     {isRefining ? "..." : boardVolume?.toFixed(1) || ((parameters.length * parameters.width * parameters.thickness / 1000 * 0.6).toFixed(1))}L
+                     {isRefining ? "..." : boardVolume?.toFixed(1) || (parameters.length * 12 * parameters.width * parameters.thickness * 0.016387 * 0.6).toFixed(1)}L
                    </div>
                  </div>
                  <div className="bg-secondary/30 rounded-xl p-4 text-center border border-white/5">
                    <div className="text-xs text-muted-foreground mb-1">Price Est.</div>
                    <div className="text-2xl font-bold text-heading font-mono">
-                     ${Math.round(parameters.length * 0.45 + 400)}
+                     ${Math.round(parameters.length * 90 + 300)}
                    </div>
                  </div>
                </div>
@@ -416,12 +416,12 @@ export default function SurfboardConfigurator({
                 <div>
                    <div className="flex justify-between text-xs mb-2">
                      <span className="text-muted-foreground">Stability vs Performance</span>
-                     <span className="text-heading font-medium">{parameters.width > 52 ? "High Stability" : "High Performance"}</span>
+                     <span className="text-heading font-medium">{parameters.width > 20.5 ? "High Stability" : "High Performance"}</span>
                    </div>
                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                     <div 
+                     <div
                        className="h-full bg-primary transition-all duration-500"
-                       style={{ width: `${Math.min(100, (parameters.width / 65) * 100)}%` }} 
+                       style={{ width: `${Math.min(100, (parameters.width / 25) * 100)}%` }}
                      />
                    </div>
                 </div>
@@ -430,11 +430,11 @@ export default function SurfboardConfigurator({
                   <ul className="space-y-3 text-sm text-muted-foreground">
                     <li className="flex items-start gap-3">
                       <CheckCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                      <span>Best for <strong className="text-heading">{parameters.length > 200 ? "Longboard/Cruising" : "Shortboard/Maneuvers"}</strong> style.</span>
+                      <span>Best for <strong className="text-heading">{parameters.length > 8 ? "Longboard/Cruising" : "Shortboard/Maneuvers"}</strong> style.</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <CheckCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                      <span>Tail shape optimized for <strong className="text-heading">{parameters.tailWidth > 37 ? "small, mushy waves" : "steep, hollow waves"}</strong>.</span>
+                      <span>Tail shape optimized for <strong className="text-heading">{parameters.tailWidth > 14.5 ? "small, mushy waves" : "steep, hollow waves"}</strong>.</span>
                     </li>
                   </ul>
                 </div>

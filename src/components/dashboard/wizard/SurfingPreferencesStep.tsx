@@ -1,226 +1,228 @@
-import { UseFormReturn } from 'react-hook-form';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { UserDetails } from '@/types/userDetails';
+import { UseFormReturn } from "react-hook-form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { MapPin } from "lucide-react";
+import { UserDetails } from "@/types/userDetails";
 
 interface SurfingPreferencesStepProps {
   form: UseFormReturn<UserDetails>;
 }
 
+const WAVE_TYPE_OPTIONS = [
+  { value: "small-mushy", label: "Small mushy waves" },
+  { value: "steep-fast", label: "Steep fast waves" },
+  { value: "reef-breaks", label: "Reef breaks" },
+];
+
 export default function SurfingPreferencesStep({ form }: SurfingPreferencesStepProps) {
+  const waveTypeValue: string[] = form.watch("wave_type_preference") || [];
+
+  const toggleWaveType = (value: string, checked: boolean) => {
+    const current = waveTypeValue;
+    if (checked) {
+      form.setValue("wave_type_preference", [...current, value]);
+    } else {
+      form.setValue(
+        "wave_type_preference",
+        current.filter((v) => v !== value)
+      );
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Primary Preferences */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <FormField
-          control={form.control}
-          name="fitness_level"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-heading">Fitness Level</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
-                    <SelectValue />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-card border-border text-heading">
-                  <SelectItem value="low">Low - Casual surfer</SelectItem>
-                  <SelectItem value="avg">Average - Regular exercise</SelectItem>
-                  <SelectItem value="high">High - Very active</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Surfing Style */}
+      <FormField
+        control={form.control}
+        name="surfing_style"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-foreground font-medium">
+              What's your surfing style?
+            </FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
+                  <SelectValue placeholder="Select surfing style" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent className="bg-card border-border text-heading">
+                <SelectItem value="cruising">Cruising</SelectItem>
+                <SelectItem value="progressive">Progressive</SelectItem>
+                <SelectItem value="high-performance">High-Performance</SelectItem>
+                <SelectItem value="big-wave">Big Wave</SelectItem>
+                <SelectItem value="retro">Retro</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <FormField
-          control={form.control}
-          name="goal_style"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-heading">Surfing Goal</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
-                    <SelectValue />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-card border-border text-heading">
-                  <SelectItem value="performance">Performance</SelectItem>
-                  <SelectItem value="trim">Trim (Flow)</SelectItem>
-                  <SelectItem value="noseride">Noseride</SelectItem>
-                  <SelectItem value="all-rounder">All-rounder</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        <FormField
-          control={form.control}
-          name="stance_bias"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-heading">Stance Preference</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
-                    <SelectValue />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-card border-border text-heading">
-                  <SelectItem value="front-foot">Front-foot heavy</SelectItem>
-                  <SelectItem value="back-foot">Back-foot heavy</SelectItem>
-                  <SelectItem value="neutral">Neutral/balanced</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="wind_regime"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-heading">Typical Wind</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
-                    <SelectValue />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-card border-border text-heading">
-                  <SelectItem value="onshore">Onshore</SelectItem>
-                  <SelectItem value="offshore">Offshore</SelectItem>
-                  <SelectItem value="variable">Variable</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-
-      {/* Advanced Options */}
-      <div className="space-y-4 pt-4 border-t border-border/50">
-        <h3 className="text-lg font-medium text-heading">Advanced Specifications</h3>
-        
-        <div className="grid md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="construction_preference"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-heading">Board Construction</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="bg-card border-border text-heading">
-                    <SelectItem value="PU">PU (Polyurethane)</SelectItem>
-                    <SelectItem value="EPS">EPS (Epoxy)</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="rocker_profile_type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-heading">Rocker Profile</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="bg-card border-border text-heading">
-                    <SelectItem value="continuous">Continuous</SelectItem>
-                    <SelectItem value="staged">Staged</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      {/* Wave Type Preference (multi-select) */}
+      <FormItem>
+        <FormLabel className="text-foreground font-medium">
+          What type of waves do you surf most often?
+        </FormLabel>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+          {WAVE_TYPE_OPTIONS.map((option) => {
+            const checked = waveTypeValue.includes(option.value);
+            return (
+              <label
+                key={option.value}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all border ${
+                  checked
+                    ? "bg-primary/10 border-primary text-heading"
+                    : "bg-secondary/50 border-border text-muted-foreground hover:text-foreground hover:bg-secondary/80"
+                }`}
+              >
+                <Checkbox
+                  checked={checked}
+                  onCheckedChange={(val) => toggleWaveType(option.value, !!val)}
+                  className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                />
+                <span className="text-sm font-medium">{option.label}</span>
+              </label>
+            );
+          })}
         </div>
+      </FormItem>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <FormField
-            control={form.control}
-            name="swell_period_s"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-heading">Swell Period (s)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="12"
-                    className="bg-secondary/50 border-border text-heading"
-                    {...field}
-                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      {/* Desired Board Feel */}
+      <FormField
+        control={form.control}
+        name="board_feel"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-foreground font-medium">
+              How do you want the board to feel?
+            </FormLabel>
+            <FormControl>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {[
+                  { value: "loose-playful", label: "Loose & Playful" },
+                  { value: "stable-forgiving", label: "Stable & Forgiving" },
+                  { value: "fast-responsive", label: "Fast & Responsive" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => field.onChange(option.value)}
+                    className={`px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      field.value === option.value
+                        ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.3)]"
+                        : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-          <FormField
-              control={form.control}
-              name="water_temp_C"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-heading">Water Temp (°C)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="20"
-                      className="bg-secondary/50 border-border text-heading"
-                      {...field}
-                      onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      {/* Current Board Feedback */}
+      <FormField
+        control={form.control}
+        name="current_board_feedback"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-foreground font-medium">
+              What do you like or dislike about your current board?{" "}
+              <span className="text-muted-foreground font-normal">(optional)</span>
+            </FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder='e.g. "Too slow to paddle" or "Great for turns"'
+                className="rounded-xl border-border bg-secondary/50 text-heading min-h-[80px] resize-none"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-            <FormField
-              control={form.control}
-              name="wetsuit"
-              render={({ field }) => (
-                <FormItem className="flex flex-col justify-center items-start pt-6">
-                  <div className="flex items-center gap-3">
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormLabel className="text-heading m-0 pb-0 cursor-pointer">Use Wetsuit</FormLabel>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-        </div>
-      </div>
+      {/* Home Break */}
+      <FormField
+        control={form.control}
+        name="home_break"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-foreground font-medium">
+              Where do you surf most often?{" "}
+              <span className="text-muted-foreground font-normal">(optional)</span>
+            </FormLabel>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <FormControl>
+                <Input
+                  placeholder='e.g. "Huntington Beach, CA" or "Snapper Rocks, AUS"'
+                  className="h-12 pl-10 rounded-xl border-border bg-secondary/50 text-heading"
+                  {...field}
+                />
+              </FormControl>
+            </div>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* Wave Size */}
+      <FormField
+        control={form.control}
+        name="wave_size"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-foreground font-medium">
+              What's the average wave height you surf?
+            </FormLabel>
+            <FormControl>
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                {[
+                  { value: "0-2ft", label: "0–2 ft" },
+                  { value: "2-4ft", label: "2–4 ft" },
+                  { value: "4-6ft", label: "4–6 ft" },
+                  { value: "6-10ft", label: "6–10 ft" },
+                  { value: "10+ft", label: "10+ ft" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => field.onChange(option.value)}
+                    className={`px-3 py-3 rounded-xl text-sm font-medium transition-all ${
+                      field.value === option.value
+                        ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.3)]"
+                        : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }
