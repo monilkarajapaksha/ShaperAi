@@ -10,6 +10,8 @@ export const boardReconfigurationService = {
   reconfigure: (request: ReconfigureBoardRequest) =>
     httpClient.post<ReconfigureBoardResponse>(BOARD_RECONFIGURATION_ENDPOINT, {
       data: request,
+      timeout: 60_000,
+      retries: 0,
     }),
 };
 

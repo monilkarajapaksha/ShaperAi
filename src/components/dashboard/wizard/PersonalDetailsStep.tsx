@@ -15,33 +15,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { UserDetails } from "@/types/userDetails";
+import { BOARD_TYPES } from "@/types/boardDesign";
 
 interface PersonalDetailsStepProps {
   form: UseFormReturn<UserDetails>;
 }
 
-const BOARD_TYPES = [
-  "Shortboard",
-  "Groveler",
-  "Fish",
-  "Hybrid",
-  "Step-up",
-  "Gun",
-  "Mid-length",
-  "Egg",
-  "Mini-Mal",
-  "Longboard",
-  "Noserider",
-  "Performance Longboard",
-  "Single Fin",
-  "Twin Fin",
-  "Thruster",
-  "Quad",
-  "Soft-top",
-  "Foamie",
-  "Retro board",
-  "Log",
-];
 
 export default function PersonalDetailsStep({ form }: PersonalDetailsStepProps) {
   return (
@@ -283,8 +262,8 @@ export default function PersonalDetailsStep({ form }: PersonalDetailsStepProps) 
               </FormControl>
               <SelectContent className="bg-card border-border text-heading">
                 {BOARD_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
+                  <SelectItem key={type.id} value={type.id}>
+                    {type.name}
                   </SelectItem>
                 ))}
               </SelectContent>

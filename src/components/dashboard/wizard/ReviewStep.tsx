@@ -4,6 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { UserDetails } from "@/types/userDetails";
+import { BOARD_COLORS, FIN_COLORS, FIN_SETUPS, FINISHES, TAIL_SHAPES, boardTypeName } from "@/types/boardDesign";
+
+const nameOf = (list: readonly { id: string; name: string }[], id?: string) => list.find((x) => x.id === id)?.name;
+const colorName = (hex?: string) => [...BOARD_COLORS, ...FIN_COLORS].find((c) => c.hex === hex)?.name;
 import { User, Activity, Waves, Settings, Loader2, Wrench, Palette } from "lucide-react";
 import { toast } from "sonner";
 
@@ -13,8 +17,8 @@ interface ReviewStepProps {
 }
 
 function Row({ label, value }: { label: string; value?: string | number | boolean | null }) {
-  if (value === undefined || value === null || value === "" || value === false) return null;
-  const display = typeof value === "boolean" ? "Yes" : String(value);
+  if (value === undefined || value === null || value === "") return null;
+  const display = typeof value === "boolean" ? (value ? "Yes" : "No") : String(value);
   return (
     <div className="flex justify-between border-b border-border/30 pb-2 last:border-0 last:pb-0">
       <span className="text-muted-foreground">{label}:</span>
@@ -58,7 +62,7 @@ export default function ReviewStep({ form, onComplete }: ReviewStepProps) {
             <Row label="Skill" value={data.skill} />
             <Row label="Frequency" value={data.surf_frequency} />
             <Row label="Stance" value={data.stance} />
-            <Row label="Board Type" value={data.board_type_preference} />
+            <Row label="Board Type" value={data.board_type_preference && boardTypeName(data.board_type_preference)} />
           </div>
         </Card>
 
@@ -98,18 +102,22 @@ export default function ReviewStep({ form, onComplete }: ReviewStepProps) {
         )}
 
         {/* Shape Features */}
-        {(data.nose_shape || data.tail_shape || data.nose_rocker) && (
+        {(data.nose_shape || data.tail_shape || data.wide_point || data.nose_rocker || data.tail_rocker ||
+          data.rail_profile || data.rail_edge || data.deck_dome || data.bottom_contour) && (
           <Card className="p-5 bg-secondary/20 border-border/50">
             <div className="flex items-center gap-2 mb-4">
               <Settings className="w-4 h-4 text-orange-400" />
               <h3 className="font-semibold text-orange-400">Shape Features</h3>
             </div>
             <div className="space-y-2 text-sm">
-              <Row label="Nose Shape" value={data.nose_shape} />
-              <Row label="Tail Shape" value={data.tail_shape} />
+              <Row label="Nose Tip" value={data.nose_shape} />
+              <Row label="Wide Point" value={data.wide_point} />
+              <Row label="Tail Shape" value={nameOf(TAIL_SHAPES, data.tail_shape)} />
               <Row label="Nose Rocker" value={data.nose_rocker} />
               <Row label="Tail Rocker" value={data.tail_rocker} />
-              <Row label="Rail Profile" value={data.rail_profile?.replace(/-/g, " ")} />
+              <Row label="Rail Profile" value={data.rail_profile} />
+              <Row label="Rail Edge" value={data.rail_edge} />
+              <Row label="Deck Dome" value={data.deck_dome} />
               <Row label="Bottom" value={data.bottom_contour?.replace(/-/g, " ")} />
             </div>
           </Card>
@@ -117,35 +125,37 @@ export default function ReviewStep({ form, onComplete }: ReviewStepProps) {
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
-        {/* Fins & Materials */}
-        {(data.fin_configuration || data.core_material) && (
+        {/* Fins & Construction */}
+        {(data.fin_configuration || data.fin_size || data.fin_placement ||
+          data.stringer !== undefined || data.leash_plug !== undefined || data.finish) && (
           <Card className="p-5 bg-secondary/20 border-border/50">
             <div className="flex items-center gap-2 mb-4">
               <Wrench className="w-4 h-4 text-purple-400" />
-              <h3 className="font-semibold text-purple-400">Fins &amp; Materials</h3>
+              <h3 className="font-semibold text-purple-400">Fins &amp; Construction</h3>
             </div>
             <div className="space-y-2 text-sm">
-              <Row label="Fins" value={data.fin_configuration} />
+              <Row label="Fins" value={nameOf(FIN_SETUPS, data.fin_configuration)} />
               <Row label="Fin Size" value={data.fin_size} />
-              <Row label="Core" value={data.core_material} />
-              <Row label="Lamination" value={data.lamination_strength?.replace(/-/g, " ")} />
-              <Row label="Carbon" value={data.carbon_reinforcement} />
-              <Row label="Carbon Placement" value={data.carbon_placement?.replace(/-/g, " ")} />
+              <Row label="Fin Placement" value={data.fin_placement} />
+              <Row label="Stringer" value={data.stringer} />
+              <Row label="Leash Plug" value={data.leash_plug} />
+              <Row label="Finish" value={nameOf(FINISHES, data.finish)} />
             </div>
           </Card>
         )}
 
-        {/* Aesthetics */}
-        {(data.color_preference || data.finish) && (
+        {/* Colors */}
+        {(data.deck_color || data.bottom_color || data.fin_color || data.units) && (
           <Card className="p-5 bg-secondary/20 border-border/50">
             <div className="flex items-center gap-2 mb-4">
               <Palette className="w-4 h-4 text-pink-400" />
-              <h3 className="font-semibold text-pink-400">Aesthetics</h3>
+              <h3 className="font-semibold text-pink-400">Colors &amp; Units</h3>
             </div>
             <div className="space-y-2 text-sm">
-              <Row label="Color" value={data.color_preference} />
-              <Row label="Finish" value={data.finish} />
-              <Row label="Graphics" value={data.custom_graphics} />
+              <Row label="Deck" value={colorName(data.deck_color)} />
+              <Row label="Bottom" value={colorName(data.bottom_color)} />
+              <Row label="Fins" value={colorName(data.fin_color)} />
+              <Row label="Units" value={data.units === "metric" ? "Metric" : data.units ? "Ft / in" : undefined} />
             </div>
           </Card>
         )}

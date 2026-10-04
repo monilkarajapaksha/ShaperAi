@@ -1,448 +1,274 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { UserDetails, SurfboardSuggestion } from "@/types/userDetails";
-import { boardStorage } from "@/lib/boardStorage";
-import {
-  ArrowLeft,
-  CheckCircle,
-  HelpCircle,
-  User,
-  Settings,
-  RefreshCw,
-} from "lucide-react";
-import { toast } from "sonner";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Loader2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { toast } from "sonner";
+import BoardBuilder, { BoardBuilderHandle } from "@/components/builder/BoardBuilder";
+import { boardStorage, toStoredDesign } from "@/lib/boardStorage";
 import boardReconfigurationService from "@/services/boardReconfigurationService";
-import SurfboardViewer from "./SurfboardViewer";
+import { SavedSurfboard } from "@/types/userDetails";
+import { BoardDesign, BoardDesignInput, BoardParams } from "@/types/boardDesign";
 
 interface SurfboardConfiguratorProps {
-  userDetails?: UserDetails;
-  suggestion?: SurfboardSuggestion;
-  onBack?: () => void;
   boardId?: string;
   isEditMode?: boolean;
+  onBack?: () => void;
 }
 
-export default function SurfboardConfigurator({
-  userDetails,
-  suggestion,
-  onBack,
-  boardId,
-  isEditMode = false,
-}: SurfboardConfiguratorProps) {
-  const navigate = useNavigate();
-  const [boardName, setBoardName] = useState("");
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [originalBoardData, setOriginalBoardData] = useState<any>(null);
-  const [parameters, setParameters] = useState({
-    length: suggestion?.length || 6.5,     // ft
-    width: suggestion?.width || 21.0,      // inches
-    thickness: suggestion?.thickness || 2.75, // inches
-    noseWidth: suggestion?.noseWidth || 14.5, // inches
-    tailWidth: suggestion?.tailWidth || 16.0, // inches
-  });
+// Builder (Modernist) palette so the page chrome matches the configurator.
+const INK = "#201e1d";
+const ACCENT = "#ec3013";
 
-  const [boardVolume, setBoardVolume] = useState<number | null>(
-    suggestion?.boardVolume || null
+const PARAM_LABELS: Record<keyof BoardParams, string> = {
+  length: "Length", width: "Width", thickness: "Thickness", noseWidth: "Nose width", tailWidth: "Tail width",
+  widePoint: "Wide point", noseTip: "Nose tip", tailShape: "Tail shape", tailDepth: "Tail depth",
+  noseRocker: "Nose rocker", tailRocker: "Tail rocker", noseThickness: "Nose thickness", tailThickness: "Tail thickness",
+  railProfile: "Rail profile", railEdge: "Rail edge", deckDome: "Deck dome", singleConcave: "Single concave",
+  doubleConcave: "Double concave", vee: "Vee", channels: "Channels", fins: "Fins", finDepth: "Fin depth",
+  finCant: "Fin cant", finToe: "Fin toe", stringer: "Stringer", leashPlug: "Leash plug", finish: "Finish",
+};
+
+/** Comparable snapshot of what the user can edit in the builder. */
+const designKey = (d: Pick<BoardDesign, "type" | "params" | "colors" | "units">) =>
+  JSON.stringify({ type: d.type, params: d.params, colors: d.colors, units: d.units });
+
+const toInput = (d: BoardDesign): BoardDesignInput => ({ type: d.type, units: d.units, params: d.params, colors: d.colors });
+
+function changedParams(before: BoardDesign, after: BoardDesign): string[] {
+  const out = (Object.keys(PARAM_LABELS) as (keyof BoardParams)[])
+    .filter((k) => JSON.stringify(before.params[k]) !== JSON.stringify(after.params[k]))
+    .map((k) => PARAM_LABELS[k]);
+  if (before.type !== after.type) out.unshift(`Type → ${after.typeName}`);
+  if (JSON.stringify(before.colors) !== JSON.stringify(after.colors)) out.push("Colors");
+  return out;
+}
+
+export default function SurfboardConfigurator({ boardId, isEditMode = false, onBack }: SurfboardConfiguratorProps) {
+  const navigate = useNavigate();
+  const builderRef = useRef<BoardBuilderHandle>(null);
+
+  const board = useMemo<SavedSurfboard | null>(() => (boardId ? boardStorage.getById(boardId) : null), [boardId]);
+  const initialDesign = useMemo<BoardDesignInput>(
+    () => (board ? toInput(board.design as BoardDesign) : { type: "shortboard" }),
+    [board]
   );
 
-  const [surfboardColor, setSurfboardColor] = useState("#f5f5dc");
-  const [surfboardTexture, setSurfboardTexture] = useState("classic");
-  const [fins, setFins] = useState({
-    center: true,
-    side: false,
-    thruster: false,
-  });
+  const [ready, setReady] = useState(false);
+  const [design, setDesign] = useState<BoardDesign | null>(null);
+  const [baseline, setBaseline] = useState<string | null>(null);
+  const [boardName, setBoardName] = useState(board?.name ?? "");
+  const [savedName, setSavedName] = useState(board?.name ?? "");
+  const [isSaving, setIsSaving] = useState(false);
 
-  // New state for refinement input
   const [refinementInput, setRefinementInput] = useState("");
   const [isRefining, setIsRefining] = useState(false);
+  const [reasoning, setReasoning] = useState(board?.suggestion?.reasoning ?? "");
+  const [showReasoning, setShowReasoning] = useState(!!board?.suggestion?.reasoning);
+  const targetVolume = board?.suggestion?.targetVolumeLiters;
 
-  // Load existing board data if in edit mode
+  const isDirty = ready && !!design && (designKey(design) !== baseline || boardName.trim() !== savedName);
+
   useEffect(() => {
-    if (isEditMode && boardId) {
-      const savedBoard = boardStorage.getById(boardId);
-      if (savedBoard) {
-        setBoardName(savedBoard.name);
-        setParameters(savedBoard.parameters);
-        setSurfboardColor(savedBoard.appearance.color);
-        setSurfboardTexture(savedBoard.appearance.texture);
-        setFins(savedBoard.appearance.fins);
-
-        // Set board volume if available from suggestion
-        if (savedBoard.suggestion?.boardVolume) {
-          setBoardVolume(savedBoard.suggestion.boardVolume);
-        }
-
-        // Store original data for comparison
-        setOriginalBoardData({
-          name: savedBoard.name,
-          parameters: savedBoard.parameters,
-          appearance: savedBoard.appearance,
-        });
-      }
-    } else if (!isEditMode) {
-      // Generate default name for new boards only once
-      const defaultName = boardStorage.generateName({
-        parameters,
-        appearance: { color: surfboardColor, texture: surfboardTexture, fins },
-      });
-      setBoardName(defaultName);
+    if (isEditMode && boardId && !board) {
+      toast.error("Board not found");
+      navigate("/dashboard");
     }
-  }, [isEditMode, boardId]);
+  }, [isEditMode, boardId, board, navigate]);
 
-  // Check for unsaved changes
   useEffect(() => {
-    if (isEditMode && originalBoardData) {
-      const currentData = {
-        name: boardName,
-        parameters,
-        appearance: { color: surfboardColor, texture: surfboardTexture, fins },
-      };
+    if (!isDirty) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [isDirty]);
 
-      const hasChanges =
-        JSON.stringify(currentData) !== JSON.stringify(originalBoardData);
-      setHasUnsavedChanges(hasChanges);
-    } else if (!isEditMode) {
-      // For new boards, always show as having changes if there's content
-      setHasUnsavedChanges(!!boardName.trim());
-    }
-  }, [
-    boardName,
-    parameters,
-    surfboardColor,
-    surfboardTexture,
-    fins,
-    originalBoardData,
-    isEditMode,
-  ]);
-
-  const handleSave = () => {
-    if (!boardName.trim()) {
-      toast.error("Please enter a board name");
-      return;
-    }
-
-    try {
-      const boardData = {
-        parameters,
-        appearance: {
-          color: surfboardColor,
-          texture: surfboardTexture,
-          fins,
-        },
-        userDetails,
-        suggestion,
-      };
-
-      if (isEditMode && boardId) {
-        // Update existing board
-        const updatedBoard = boardStorage.update(boardId, boardData, boardName);
-        if (updatedBoard) {
-          toast.success("Board updated successfully!");
-          // Update original data to reflect the save
-          setOriginalBoardData({
-            name: boardName,
-            parameters,
-            appearance: {
-              color: surfboardColor,
-              texture: surfboardTexture,
-              fins,
-            },
-          });
-          setHasUnsavedChanges(false);
-        } else {
-          toast.error("Failed to update board");
-        }
-      } else {
-        // Save new board
-        const savedBoard = boardStorage.save(boardData, boardName);
-        toast.success(`"${boardName}" saved to your collection!`);
-        // Navigate to edit mode for this board
-        navigate(`/configurator/${savedBoard.id}`);
+  const handleReady = (full: BoardDesign) => {
+    setDesign(full);
+    setBaseline(designKey(full));
+    setReady(true);
+    if (board) {
+      // AI-generated and migrated boards are stored as partial designs; store the builder's complete version (with volume).
+      if (!board.design.computed || designKey(board.design) !== designKey(full)) {
+        boardStorage.update(board.id, { design: full });
       }
-    } catch (error) {
-      console.error("Error saving board:", error);
-      toast.error("Failed to save board");
+    } else {
+      const name = boardStorage.generateName({ design: full });
+      setBoardName(name);
     }
   };
 
-  const handleQuickSave = () => {
-    if (hasUnsavedChanges) {
-      handleSave();
+  // Builder save flow → local board storage.
+  const persist = (full: BoardDesign) => {
+    const name = boardName.trim() || boardStorage.generateName({ design: full });
+    if (board) {
+      const updated = boardStorage.update(board.id, { design: full }, name);
+      if (!updated) throw new Error("board no longer exists");
+      return { id: updated.id };
     }
+    const created = boardStorage.save({ design: full }, name);
+    return { id: created.id, created: true };
+  };
+
+  const handleSave = async () => {
+    if (!builderRef.current) return;
+    setIsSaving(true);
+    const res = await builderRef.current.save();
+    setIsSaving(false);
+    if (!res.ok || !res.design) {
+      toast.error(`Failed to save board${res.error ? `: ${res.error}` : ""}`);
+      return;
+    }
+    const result = res.result as { id: string; created?: boolean };
+    const name = boardName.trim() || boardStorage.generateName({ design: res.design });
+    setBoardName(name);
+    setSavedName(name);
+    setBaseline(designKey(res.design));
+    toast.success(`"${name}" saved to your collection`);
+    if (result.created) navigate(`/configurator/${result.id}`, { replace: true });
+  };
+
+  const handleBack = () => {
+    if (isDirty && !window.confirm("You have unsaved changes. Leave without saving?")) return;
+    (onBack ?? (() => navigate("/dashboard")))();
   };
 
   const handleRefineBoard = async () => {
-    if (!refinementInput.trim()) {
-      toast.error("Please enter your refinement requirements");
-      return;
-    }
+    const preference = refinementInput.trim();
+    if (!preference || !builderRef.current) return;
 
     setIsRefining(true);
     try {
-      const initialSpecs = {
-        boardLength: parameters.length,
-        boardWidth: parameters.width,
-        boardThickness: parameters.thickness,
-        boardType: parameters.length > 8 ? "longboard" : "shortboard",
-      };
-
-      const refinedConfig = await boardReconfigurationService.reconfigure({
-        initialSpecs,
-        additionalInfo: {
-          preference: refinementInput,
-        },
-      });
-
-      // Update parameters with refined configuration based on the API response format
-      const newParameters = { ...parameters };
-      let hasChanges = false;
-
-      // Helper to update if value exists
-      const updateIfPresent = (key: keyof typeof parameters, val: number | undefined) => {
-        if (val !== undefined && val !== null) {
-          newParameters[key] = val;
-          hasChanges = true;
-        }
-      };
-
-      updateIfPresent('length', refinedConfig.boardLength);
-      updateIfPresent('width', refinedConfig.boardWidth);
-      updateIfPresent('thickness', refinedConfig.boardThickness);
-      updateIfPresent('noseWidth', refinedConfig.boardNoseWidth);
-      updateIfPresent('tailWidth', refinedConfig.boardTailWidth);
-
-      // Update board volume if provided
-      if (
-        refinedConfig.boardVolume !== undefined &&
-        refinedConfig.boardVolume !== null
-      ) {
-        setBoardVolume(refinedConfig.boardVolume);
-        hasChanges = true;
-      }
-
-      if (hasChanges) {
-        setParameters(newParameters);
-        toast.success("Board configuration refined successfully!");
-      } else {
-        toast.info("No changes were made to the board configuration");
-      }
-
-      // Clear the input
+      const before = await builderRef.current.getDesign();
+      const res = await boardReconfigurationService.reconfigure({ design: toInput(before), preference });
+      const after = await builderRef.current.setDesign(toStoredDesign({ ...res.design, units: before.units }));
+      setDesign(after);
+      setReasoning(res.reasoning);
+      setShowReasoning(true);
       setRefinementInput("");
+
+      const changes = changedParams(before, after);
+      if (changes.length) {
+        toast.success("Board refined", {
+          description: `Changed: ${changes.join(", ")}`,
+          action: { label: "Undo", onClick: () => builderRef.current?.setDesign(toInput(before)).then(setDesign) },
+        });
+      } else {
+        toast.info("The AI kept the current shape", { description: res.reasoning });
+      }
     } catch (error) {
       console.error("Error refining board:", error);
-      toast.error(
-        "Failed to refine board via AI. Make sure the backend is connected."
-      );
+      toast.error("Failed to refine board via AI. Make sure the backend is connected.");
     } finally {
       setIsRefining(false);
     }
   };
 
+  if (isEditMode && boardId && !board) return null;
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-[1400px] mx-auto px-6">
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl py-4 border-b border-white/5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                onClick={() => navigate('/dashboard')}
-                className="rounded-full border-border/50 hover:bg-white/5 bg-transparent"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Dashboard
-              </Button>
-              <div className="h-6 w-px bg-white/10" />
-              <h1 className="text-xl font-bold text-heading">
-                {isEditMode ? "Edit Configuration" : "New Configuration"}
-              </h1>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              {/* Quick Save Button */}
-              {boardName.trim() && (
-                <Button
-                  onClick={handleQuickSave}
-                  disabled={isEditMode && !hasUnsavedChanges}
-                  className={`flex items-center gap-2 rounded-full h-10 px-6 transition-all ${
-                    isEditMode && !hasUnsavedChanges
-                      ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                      : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(var(--primary),0.3)]"
-                  }`}
-                >
-                  <CheckCircle className="w-4 h-4" />
-                  {isEditMode && !hasUnsavedChanges ? "Saved" : "Save Changes"}
-                </Button>
-              )}
-            </div>
+    <div
+      className="min-h-screen md:h-screen flex flex-col md:overflow-hidden"
+      style={{ background: "#f3f2f2", color: INK, fontFamily: '"Archivo", system-ui, sans-serif' }}
+    >
+      {/* App bar */}
+      <header className="flex flex-wrap items-center gap-3 px-4 py-3 border-b-2 border-[#201e1d]/40">
+        <button
+          type="button"
+          onClick={handleBack}
+          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-extrabold border border-[#201e1d]/40 hover:bg-[#201e1d]/[0.07]"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Dashboard
+        </button>
+        <div className="flex flex-col min-w-[200px] flex-1 max-w-md">
+          <label htmlFor="board-name" className="text-[11px] uppercase tracking-[0.08em] text-[#605d5d]">
+            {isEditMode ? "Edit design" : "New design"}
+          </label>
+          <input
+            id="board-name"
+            value={boardName}
+            onChange={(e) => setBoardName(e.target.value)}
+            placeholder="Board name"
+            className="bg-transparent text-lg font-extrabold outline-none border-b border-transparent focus:border-[#ec3013] placeholder:text-[#9b9797]"
+          />
+        </div>
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-xs text-[#605d5d] tabular-nums" role="status" aria-live="polite">
+            {!ready ? "Loading builder…" : isDirty ? "Unsaved changes" : "All changes saved"}
+          </span>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={!ready || isSaving || (!isDirty && !!board)}
+            className="px-4 py-2 text-sm font-extrabold text-[#f3f2f2] disabled:opacity-45 disabled:cursor-not-allowed hover:brightness-95"
+            style={{ background: ACCENT }}
+          >
+            {isSaving ? "Saving…" : "Save design"}
+          </button>
+        </div>
+      </header>
+
+      {/* AI refinement */}
+      <section className="px-4 py-3 border-b-2 border-[#201e1d]/40 bg-[#eae9e9]">
+        <form
+          className="flex flex-wrap items-center gap-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleRefineBoard();
+          }}
+        >
+          <span className="inline-flex items-center gap-2 text-[13px] font-extrabold uppercase tracking-[0.08em]">
+            <Sparkles className="w-4 h-4" style={{ color: ACCENT }} />
+            AI shaper
+          </span>
+          <input
+            value={refinementInput}
+            onChange={(e) => setRefinementInput(e.target.value)}
+            disabled={!ready || isRefining}
+            placeholder={`e.g. "More paddle power for small waves" or "Make it looser in steep surf"`}
+            className="flex-1 min-w-[220px] h-9 px-3 text-sm bg-[#f3f2f2] border border-[#201e1d]/40 outline-none focus:border-[#ec3013]"
+          />
+          <button
+            type="submit"
+            disabled={!ready || isRefining || !refinementInput.trim()}
+            className="inline-flex items-center gap-2 h-9 px-4 text-sm font-extrabold border border-[#201e1d]/40 hover:bg-[#201e1d]/[0.07] disabled:opacity-45 disabled:cursor-not-allowed"
+          >
+            {isRefining && <Loader2 className="w-4 h-4 animate-spin" />}
+            {isRefining ? "Refining…" : "Refine shape"}
+          </button>
+          {(reasoning || targetVolume) && (
+            <button
+              type="button"
+              onClick={() => setShowReasoning((v) => !v)}
+              className="inline-flex items-center gap-1 text-sm font-semibold"
+              style={{ color: ACCENT }}
+            >
+              Why this shape
+              {showReasoning ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+          )}
+        </form>
+        {showReasoning && (reasoning || targetVolume) && (
+          <div className="mt-2 text-[13px] leading-relaxed text-[#444141] max-w-5xl">
+            {targetVolume && design && (
+              <p className="mb-1 tabular-nums">
+                AI target volume <b>{targetVolume.toFixed(1)} L</b> · current <b>{design.computed.volumeLiters.toFixed(1)} L</b>
+              </p>
+            )}
+            {reasoning && <p className="m-0">{reasoning}</p>}
           </div>
-        </header>
+        )}
+      </section>
 
-        {/* Main Grid Layout */}
-        <main className="grid lg:grid-cols-12 gap-8 py-8 md:py-12">
-          {/* Left Column - Board Display */}
-          <div className="lg:col-span-8 space-y-6">
-            {/* Board Image Viewer */}
-            <SurfboardViewer
-              parameters={parameters}
-              surfboardColor={surfboardColor}
-              isRefining={isRefining}
-            />
-
-            {/* AI Refinement Tools */}
-             <div className="bg-card border border-border/50 rounded-2xl shadow-xl p-6">
-                <div className="flex items-center gap-2 mb-4">
-                   <RefreshCw className="w-5 h-5 text-primary" />
-                   <h3 className="text-lg font-bold text-heading">AI Refinement</h3>
-                </div>
-                <div className="flex gap-3">
-                   <Input 
-                      placeholder="e.g. 'Make it faster for steep waves' or 'Increase stability'"
-                      value={refinementInput}
-                      onChange={(e) => setRefinementInput(e.target.value)}
-                      className="bg-secondary/50 border-border/50 text-heading h-12 rounded-xl"
-                   />
-                   <Button 
-                     onClick={handleRefineBoard}
-                     disabled={isRefining || !refinementInput.trim()}
-                     className="h-12 px-6 rounded-xl bg-primary/20 text-primary hover:bg-primary/30 border border-primary/20 whitespace-nowrap"
-                   >
-                     {isRefining ? "Optimizing..." : "Refine Shape"}
-                   </Button>
-                </div>
-             </div>
-
-            {/* Dimensions & Tolerances Table */}
-            <div className="bg-card border border-border/50 rounded-2xl shadow-xl p-6">
-              <h3 className="text-lg font-bold text-heading mb-4">
-                Dimensions & Tolerances
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead>
-                    <tr className="text-muted-foreground border-b border-white/5">
-                      <th className="p-3 font-medium">Dimension</th>
-                      <th className="p-3 font-medium">Value</th>
-                      <th className="p-3 font-medium">Tolerance</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                     {[
-                       { label: 'Length', val: parameters.length, unit: 'ft', tol: '± 0.08 ft' },
-                       { label: 'Width', val: parameters.width, unit: '"', tol: '± 0.5"' },
-                       { label: 'Thickness', val: parameters.thickness, unit: '"', tol: '± 0.25"' },
-                       { label: 'Nose Width', val: parameters.noseWidth, unit: '"', tol: '± 0.5"' },
-                       { label: 'Tail Width', val: parameters.tailWidth, unit: '"', tol: '± 0.5"' },
-                     ].map((item) => (
-                       <tr key={item.label} className="hover:bg-white/5 transition-colors">
-                         <td className="p-3 text-heading">{item.label}</td>
-                         <td className="p-3 text-primary font-mono">
-                           {isRefining ? (
-                             <div className="h-4 w-12 bg-secondary animate-pulse rounded" />
-                           ) : (
-                             `${item.val.toFixed(2)} ${item.unit}`
-                           )}
-                         </td>
-                         <td className="p-3 text-muted-foreground opacity-70">{item.tol}</td>
-                       </tr>
-                     ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Board Details & Controls */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Board Identity Card */}
-            <div className="bg-card border border-border/50 rounded-2xl shadow-xl p-6 space-y-6">
-              <div>
-                <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2 block">
-                  Design Name
-                </label>
-                <Input
-                  className="w-full h-12 px-4 rounded-xl border border-white/10 bg-secondary/50 focus:border-primary text-lg font-bold text-heading placeholder:text-muted-foreground/50 transition-all"
-                  placeholder="Enter board name"
-                  value={boardName}
-                  onChange={(e) => setBoardName(e.target.value)}
-                />
-              </div>
-
-               <div className="grid grid-cols-2 gap-4 pt-2">
-                 <div className="bg-secondary/30 rounded-xl p-4 text-center border border-white/5">
-                   <div className="text-xs text-muted-foreground mb-1">Volume</div>
-                   <div className="text-2xl font-bold text-primary font-mono">
-                     {isRefining ? "..." : boardVolume?.toFixed(1) || (parameters.length * 12 * parameters.width * parameters.thickness * 0.016387 * 0.6).toFixed(1)}L
-                   </div>
-                 </div>
-                 <div className="bg-secondary/30 rounded-xl p-4 text-center border border-white/5">
-                   <div className="text-xs text-muted-foreground mb-1">Price Est.</div>
-                   <div className="text-2xl font-bold text-heading font-mono">
-                     ${Math.round(parameters.length * 90 + 300)}
-                   </div>
-                 </div>
-               </div>
-
-               <div className="space-y-4 pt-4 border-t border-white/5">
-                 <div>
-                    <label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3 block">Color</label>
-                    <div className="flex flex-wrap gap-2">
-                      {['#f5f5dc', '#00bcd4', '#ff6b35', '#7fb069', '#ff006e', '#7209b7'].map((c) => (
-                        <button
-                          key={c}
-                          onClick={() => setSurfboardColor(c)}
-                          className={`w-8 h-8 rounded-full border-2 transition-transform ${surfboardColor === c ? 'border-white scale-110 shadow-[0_0_10px_rgba(255,255,255,0.5)]' : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'}`}
-                          style={{ backgroundColor: c }}
-                        />
-                      ))}
-                    </div>
-                 </div>
-               </div>
-            </div>
-
-            {/* Suitability Analysis */}
-            <div className="bg-card border border-border/50 rounded-2xl shadow-xl p-6">
-              <h3 className="text-lg font-bold text-heading mb-4 flex items-center gap-2">
-                <Settings className="w-4 h-4 text-primary" />
-                Performance Specs
-              </h3>
-              
-              <div className="space-y-4">
-                <div>
-                   <div className="flex justify-between text-xs mb-2">
-                     <span className="text-muted-foreground">Stability vs Performance</span>
-                     <span className="text-heading font-medium">{parameters.width > 20.5 ? "High Stability" : "High Performance"}</span>
-                   </div>
-                   <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                     <div
-                       className="h-full bg-primary transition-all duration-500"
-                       style={{ width: `${Math.min(100, (parameters.width / 25) * 100)}%` }}
-                     />
-                   </div>
-                </div>
-
-                <div className="pt-4 border-t border-white/5">
-                  <ul className="space-y-3 text-sm text-muted-foreground">
-                    <li className="flex items-start gap-3">
-                      <CheckCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                      <span>Best for <strong className="text-heading">{parameters.length > 8 ? "Longboard/Cruising" : "Shortboard/Maneuvers"}</strong> style.</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                      <span>Tail shape optimized for <strong className="text-heading">{parameters.tailWidth > 14.5 ? "small, mushy waves" : "steep, hollow waves"}</strong>.</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
+      {/* Board builder: presets, parameter controls, 3D view, blueprints, units, reset, OBJ/GLB export */}
+      <BoardBuilder
+        ref={builderRef}
+        className="flex-1 md:min-h-[640px] relative"
+        hide="save"
+        initialDesign={initialDesign}
+        onReady={handleReady}
+        onChange={setDesign}
+        onSave={persist}
+      />
     </div>
   );
 }

@@ -1,36 +1,11 @@
-export interface BoardSpecs {
-  length: number;
-  width: number;
-  thickness: number;
-  noseWidth: number;
-  tailWidth: number;
-  color: string;
-  texture: string;
-  fins: {
-    center: boolean;
-    side: boolean;
-    thruster: boolean;
-  };
-  volume: string;
-}
+import { BoardDesignInput } from "./boardDesign";
+import { BoardConfigurationResponse } from "./boardConfiguration";
 
+/** POST /api/reconfigure-board request — the current builder design plus a free-text request. */
 export interface ReconfigureBoardRequest {
-  initialSpecs: {
-    boardLength: number;
-    boardWidth: number;
-    boardThickness: number;
-    boardType: string;
-  };
-  additionalInfo: {
-    preference: string;
-  };
+  design: BoardDesignInput;
+  preference: string;
 }
 
-export interface ReconfigureBoardResponse {
-  boardLength?: number;
-  boardWidth?: number;
-  boardThickness?: number;
-  boardNoseWidth?: number;
-  boardTailWidth?: number;
-  boardVolume?: number;
-}
+/** Full merged design: unchanged params are carried over by the backend. */
+export type ReconfigureBoardResponse = BoardConfigurationResponse;

@@ -15,26 +15,89 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { UserDetails } from "@/types/userDetails";
+import { RAIL_PROFILES, TAIL_SHAPES } from "@/types/boardDesign";
 
 interface BoardSpecsStepProps {
   form: UseFormReturn<UserDetails>;
 }
 
-const ROCKER_OPTIONS = [
+type Option = { value: string; label: string };
+
+const LEVEL_OPTIONS: Option[] = [
   { value: "low", label: "Low" },
   { value: "medium", label: "Medium" },
   { value: "high", label: "High" },
 ];
 
-const SHAPE_OPTIONS = [
-  "Squash",
-  "Square",
-  "Round",
-  "Pin",
-  "Swallow",
-  "Bat",
-  "Diamond",
+const NOSE_OPTIONS: Option[] = [
+  { value: "pointed", label: "Pointed" },
+  { value: "medium", label: "Medium" },
+  { value: "round", label: "Round" },
 ];
+
+const WIDE_POINT_OPTIONS: Option[] = [
+  { value: "back", label: "Back" },
+  { value: "centered", label: "Centered" },
+  { value: "forward", label: "Forward" },
+];
+
+const RAIL_EDGE_OPTIONS: Option[] = [
+  { value: "soft", label: "Soft" },
+  { value: "medium", label: "Medium" },
+  { value: "hard", label: "Hard" },
+];
+
+const DECK_DOME_OPTIONS: Option[] = [
+  { value: "flat", label: "Flat" },
+  { value: "moderate", label: "Moderate" },
+  { value: "domed", label: "Domed" },
+];
+
+const BOTTOM_OPTIONS: Option[] = [
+  { value: "flat", label: "Flat" },
+  { value: "single-concave", label: "Single Concave" },
+  { value: "double-concave", label: "Double Concave" },
+  { value: "vee", label: "Vee off tail" },
+  { value: "channels", label: "Channels" },
+];
+
+type ShapeField =
+  | "nose_shape" | "wide_point" | "nose_rocker" | "tail_rocker"
+  | "rail_profile" | "rail_edge" | "deck_dome";
+
+/** Segmented single-choice field; clicking the active option clears it (no preference). */
+function ChoiceField({ form, name, label, options }: { form: UseFormReturn<UserDetails>; name: ShapeField; label: string; options: Option[] }) {
+  return (
+    <FormField
+      control={form.control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-foreground font-medium">{label}</FormLabel>
+          <FormControl>
+            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
+              {options.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => field.onChange(field.value === opt.value ? undefined : opt.value)}
+                  className={`py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    field.value === opt.value
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
 
 export default function BoardSpecsStep({ form }: BoardSpecsStepProps) {
   return (
@@ -211,179 +274,85 @@ export default function BoardSpecsStep({ form }: BoardSpecsStepProps) {
           <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-bold">5</span>
           Board Shape Features
         </h3>
-        <div className="space-y-4">
-          {/* Nose + Tail Shape */}
+        <div className="space-y-5">
+          {/* Outline */}
           <div className="grid md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="nose_shape"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground font-medium">
-                    What nose shape do you prefer?
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
-                        <SelectValue placeholder="Select nose shape" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-card border-border text-heading">
-                      {SHAPE_OPTIONS.map((s) => (
-                        <SelectItem key={s} value={s.toLowerCase()}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="tail_shape"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground font-medium">
-                    What tail shape do you want?
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
-                        <SelectValue placeholder="Select tail shape" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-card border-border text-heading">
-                      {SHAPE_OPTIONS.map((s) => (
-                        <SelectItem key={s} value={s.toLowerCase()}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <ChoiceField form={form} name="nose_shape" label="Nose tip" options={NOSE_OPTIONS} />
+            <ChoiceField form={form} name="wide_point" label="Wide point" options={WIDE_POINT_OPTIONS} />
           </div>
+
+          <FormField
+            control={form.control}
+            name="tail_shape"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-foreground font-medium">
+                  What tail shape do you want?
+                </FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
+                      <SelectValue placeholder="Let the AI choose" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="bg-card border-border text-heading">
+                    {TAIL_SHAPES.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {/* Rocker */}
           <div className="grid md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="nose_rocker"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground font-medium">Nose Rocker</FormLabel>
-                  <FormControl>
-                    <div className="grid grid-cols-3 gap-2">
-                      {ROCKER_OPTIONS.map((opt) => (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() => field.onChange(opt.value)}
-                          className={`py-2.5 rounded-xl text-sm font-medium transition-all ${
-                            field.value === opt.value
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="tail_rocker"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground font-medium">Tail Rocker</FormLabel>
-                  <FormControl>
-                    <div className="grid grid-cols-3 gap-2">
-                      {ROCKER_OPTIONS.map((opt) => (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() => field.onChange(opt.value)}
-                          className={`py-2.5 rounded-xl text-sm font-medium transition-all ${
-                            field.value === opt.value
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <ChoiceField form={form} name="nose_rocker" label="Nose rocker" options={LEVEL_OPTIONS} />
+            <ChoiceField form={form} name="tail_rocker" label="Tail rocker" options={LEVEL_OPTIONS} />
           </div>
 
-          {/* Rail Profile + Bottom Contour */}
+          {/* Rails & deck */}
+          <ChoiceField
+            form={form}
+            name="rail_profile"
+            label="Rail profile (upper / lower)"
+            options={RAIL_PROFILES.map((r) => ({ value: r, label: r }))}
+          />
           <div className="grid md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="rail_profile"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground font-medium">
-                    What rail feel do you prefer?
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
-                        <SelectValue placeholder="Select rail profile" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-card border-border text-heading">
-                      <SelectItem value="soft-full">Soft / Full</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="hard-sharp">Hard / Sharp</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="bottom_contour"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground font-medium">
-                    Any preference for bottom contour?
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
-                        <SelectValue placeholder="Select bottom contour" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-card border-border text-heading">
-                      <SelectItem value="flat">Flat</SelectItem>
-                      <SelectItem value="single-concave">Single Concave</SelectItem>
-                      <SelectItem value="double-concave">Double Concave</SelectItem>
-                      <SelectItem value="vee">Vee</SelectItem>
-                      <SelectItem value="channels">Channels</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <ChoiceField form={form} name="rail_edge" label="Rail edge" options={RAIL_EDGE_OPTIONS} />
+            <ChoiceField form={form} name="deck_dome" label="Deck dome" options={DECK_DOME_OPTIONS} />
           </div>
+
+          {/* Bottom contours */}
+          <FormField
+            control={form.control}
+            name="bottom_contour"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-foreground font-medium">
+                  Any preference for bottom contour?
+                </FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger className="h-12 rounded-xl bg-secondary/50 border-border text-heading">
+                      <SelectValue placeholder="Let the AI choose" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="bg-card border-border text-heading">
+                    {BOTTOM_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
       </div>
     </div>

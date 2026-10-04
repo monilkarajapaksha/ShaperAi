@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import UserDetailsWizard from "@/components/dashboard/UserDetailsWizard";
 import { UserDetails, SurfboardSuggestion } from "@/types/userDetails";
-import { boardStorage } from "@/lib/boardStorage";
+import { boardStorage, toStoredDesign } from "@/lib/boardStorage";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 
@@ -13,34 +13,15 @@ const CreateBoard = () => {
     suggestion: SurfboardSuggestion
   ) => {
     try {
-      // Logic to save the initial board based on suggestion
-      // We will redirect to configurator with this data
-      
-      const initialBoardData = {
-        parameters: {
-          length: suggestion.length,
-          width: suggestion.width,
-          thickness: suggestion.thickness,
-          noseWidth: suggestion.noseWidth,
-          tailWidth: suggestion.tailWidth,
-        },
-        appearance: {
-          color: "#f5f5dc",
-          texture: "classic",
-          fins: {
-            center: true,
-            side: false,
-            thruster: false,
-          },
-        },
+      // The builder completes any params the AI left out from the type's preset when it loads the board.
+      const newBoard = boardStorage.save({
+        design: toStoredDesign(suggestion.design),
         userDetails,
         suggestion,
-      };
+      });
 
-      const newBoard = boardStorage.save(initialBoardData);
-      
       toast.success("Board generated!", {
-        description: "Redirecting to configurator for fine-tuning...",
+        description: "Opening the board builder for fine-tuning...",
       });
       
       setTimeout(() => {

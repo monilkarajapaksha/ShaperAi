@@ -1,3 +1,14 @@
+import {
+  BoardDesign,
+  BoardTypeId,
+  FinSetup,
+  Finish,
+  RailProfile,
+  TailShape,
+  Units,
+} from "./boardDesign";
+import { BoardConfigurationResponse } from "./boardConfiguration";
+
 export interface UserDetails {
   // Section 1: Surfer Profile
   height_cm: number;
@@ -7,7 +18,7 @@ export interface UserDetails {
   skill: "beginner" | "intermediate" | "advanced" | "pro";
   surf_frequency: "rarely" | "monthly" | "weekly" | "daily";
   stance: "regular" | "goofy";
-  board_type_preference?: string;
+  board_type_preference?: BoardTypeId;
 
   // Section 2: Surfing Style and Preferences
   surfing_style?: "cruising" | "progressive" | "high-performance" | "big-wave" | "retro";
@@ -27,43 +38,42 @@ export interface UserDetails {
   current_nose_width_in?: number;
   current_tail_width_in?: number;
 
-  // Section 5: Board Shape Features
-  nose_shape?: string;
-  tail_shape?: string;
+  // Section 5: Board Shape Features (builder options)
+  nose_shape?: "pointed" | "medium" | "round";
+  tail_shape?: TailShape;
+  wide_point?: "back" | "centered" | "forward";
   nose_rocker?: "low" | "medium" | "high";
   tail_rocker?: "low" | "medium" | "high";
-  rail_profile?: "soft-full" | "medium" | "hard-sharp";
+  rail_profile?: RailProfile;
+  rail_edge?: "soft" | "medium" | "hard";
+  deck_dome?: "flat" | "moderate" | "domed";
   bottom_contour?: "flat" | "single-concave" | "double-concave" | "vee" | "channels";
 
-  // Section 6: Fin Setup
-  fin_configuration?: "single" | "twin" | "thruster" | "quad" | "2+1" | "5-fin";
+  // Section 6: Fin Setup (builder options)
+  fin_configuration?: FinSetup;
   fin_size?: "small" | "medium" | "large";
   fin_placement?: string;
 
-  // Section 7: Materials and Construction
-  core_material?: "PU" | "EPS";
-  lamination_strength?: "standard-4+6oz" | "light-4+4oz" | "heavy-6+6oz";
-  carbon_reinforcement?: boolean;
-  carbon_placement?: "tail-patch" | "full-rail" | "none";
+  // Section 7: Construction (builder options)
+  stringer?: boolean;
+  leash_plug?: boolean;
+  finish?: Finish;
 
-  // Section 8: Aesthetic Preferences
-  color_preference?: string;
-  finish?: "gloss" | "matte" | "satin";
-  custom_graphics?: string;
+  // Section 8: Colors (builder swatches) and display units
+  deck_color?: string;
+  bottom_color?: string;
+  fin_color?: string;
+  units?: Units;
 
   // Section 9: Additional Notes
   additional_notes?: string;
 }
 
+/** AI result: the builder design plus the shaper's reasoning. */
 export interface SurfboardSuggestion {
-  length: number;      // feet (e.g. 6.17 for 6'2")
-  width: number;       // inches
-  thickness: number;   // inches
-  noseWidth: number;   // inches
-  tailWidth: number;   // inches
+  design: BoardConfigurationResponse["design"];
+  targetVolumeLiters?: number;
   reasoning: string;
-  boardVolume?: number; // liters
-  boardType?: string;
 }
 
 export interface SavedSurfboard {
@@ -71,22 +81,8 @@ export interface SavedSurfboard {
   name: string;
   createdAt: string;
   updatedAt: string;
-  parameters: {
-    length: number;      // feet
-    width: number;       // inches
-    thickness: number;   // inches
-    noseWidth: number;   // inches
-    tailWidth: number;   // inches
-  };
-  appearance: {
-    color: string;
-    texture: string;
-    fins: {
-      center: boolean;
-      side: boolean;
-      thruster: boolean;
-    };
-  };
+  /** Builder design. `computed` is filled in once the builder has rendered it. */
+  design: Omit<BoardDesign, "computed"> & { computed?: BoardDesign["computed"] };
   userDetails?: UserDetails;
   suggestion?: SurfboardSuggestion;
   thumbnail?: string;

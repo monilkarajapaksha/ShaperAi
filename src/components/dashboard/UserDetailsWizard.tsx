@@ -11,6 +11,8 @@ import ReviewStep from "./wizard/ReviewStep";
 import { UserDetails, SurfboardSuggestion } from "@/types/userDetails";
 import { useBoardConfiguration } from "@/hooks/use-board-configuration";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { toast } from "sonner";
+import { applyExplicitChoices, fallbackSuggestion } from "@/lib/designFromPreferences";
 
 interface UserDetailsWizardProps {
   onComplete: (
@@ -32,13 +34,13 @@ const steps = [
   },
   {
     id: "board-specs",
-    title: "Board Specs",
-    description: "Current board dimensions and shape features",
+    title: "Board Shape",
+    description: "Current board, outline, rocker, rails and contours",
   },
   {
     id: "materials",
-    title: "Materials & Look",
-    description: "Fins, construction, and aesthetics",
+    title: "Fins & Finish",
+    description: "Fin setup, construction, colors and units",
   },
   {
     id: "review",
@@ -84,34 +86,14 @@ export default function UserDetailsWizard({ onComplete }: UserDetailsWizardProps
 
   const generateSuggestion = async (data: UserDetails): Promise<SurfboardSuggestion> => {
     try {
-      return await boardConfiguration.mutateAsync(data);
+      const suggestion = await boardConfiguration.mutateAsync(data);
+      return { ...suggestion, design: applyExplicitChoices(suggestion.design, data) };
     } catch (error) {
       console.error("Error fetching board configuration, using fallback:", error);
-
-      // Fallback local calculation (ft and inches)
-      const skillMultipliers: Record<string, number> = {
-        beginner: 1.2,
-        intermediate: 1.0,
-        advanced: 0.95,
-        pro: 0.9,
-      };
-      const mult = skillMultipliers[data.skill] ?? 1.0;
-      const weightFactor = data.weight_kg / 75;
-
-      const rawLength = (data.height_cm / 100) * 2 * mult * weightFactor; // rough ft
-      const fallbackLength = Math.max(5.0, Math.min(10.0, Math.round(rawLength * 4) / 4));
-      const fallbackWidth = Math.max(18, Math.min(24, Math.round(20.5 * weightFactor * 10) / 10));
-      const fallbackThickness = Math.max(2.0, Math.min(3.5, Math.round(2.75 * mult * 10) / 10));
-
-      return {
-        length: fallbackLength,
-        width: fallbackWidth,
-        thickness: fallbackThickness,
-        noseWidth: Math.round(fallbackWidth * 0.7 * 10) / 10,
-        tailWidth: Math.round(fallbackWidth * 0.8 * 10) / 10,
-        reasoning: `Based on your ${data.skill} skill level, ${data.height_cm}cm height, and ${data.weight_kg}kg weight, a ${fallbackLength}ft board is recommended.`,
-        boardVolume: Math.round(fallbackLength * 12 * fallbackWidth * fallbackThickness * 0.016387 * 0.6 * 10) / 10,
-      };
+      toast.warning("AI shaper unavailable", {
+        description: "Using an offline estimate — you can refine it in the builder.",
+      });
+      return fallbackSuggestion(data);
     }
   };
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SavedSurfboard } from "@/types/userDetails";
 import { boardStorage } from "@/lib/boardStorage";
+import { formatFeetInches, formatInches } from "@/types/boardDesign";
 import { Plus, Search, Filter, Trash2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -61,17 +62,18 @@ const Dashboard = () => {
     });
   };
 
-  const calculateVolume = (params: SavedSurfboard["parameters"]) => {
-    return (
-      ((params.length * params.width * params.thickness) / 1000) *
-      0.6
-    ).toFixed(1);
+  // Builder-computed volume when available; otherwise a rough estimate from L × W × T (inches).
+  const boardVolume = (board: SavedSurfboard) => {
+    if (board.design.computed) return board.design.computed.volumeLiters;
+    const { length, width, thickness } = board.design.params;
+    return length * width * thickness * 0.016387 * 0.56;
   };
 
-  const getSkillLevel = (volume: number, length: number) => {
-    const ratio = volume / (length / 100);
-    if (ratio < 0.3) return { level: "Advanced", percentage: 85, color: "bg-red-500" };
-    if (ratio < 0.5) return { level: "Intermediate", percentage: 55, color: "bg-yellow-500" };
+  // Volume relative to length — floatier boards for their length suit newer surfers.
+  const getSkillLevel = (volume: number, lengthIn: number) => {
+    const ratio = volume / lengthIn;
+    if (ratio < 0.42) return { level: "Advanced", percentage: 85, color: "bg-red-500" };
+    if (ratio < 0.6) return { level: "Intermediate", percentage: 55, color: "bg-yellow-500" };
     return { level: "Beginner", percentage: 30, color: "bg-green-500" };
   };
 
@@ -95,14 +97,15 @@ const Dashboard = () => {
   const filteredBoards = savedBoards.filter((board) => {
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase();
-    const volume = calculateVolume(board.parameters);
-    const skillData = getSkillLevel(parseFloat(volume), board.parameters.length);
+    const volume = boardVolume(board);
+    const skillData = getSkillLevel(volume, board.design.params.length);
 
     return (
       board.name.toLowerCase().includes(query) ||
-      board.appearance.texture.toLowerCase().includes(query) ||
-      board.appearance.color.toLowerCase().includes(query) ||
-      volume.includes(query) ||
+      board.design.typeName.toLowerCase().includes(query) ||
+      (board.design.params.tailShape ?? "").includes(query) ||
+      (board.design.params.fins ?? "").includes(query) ||
+      volume.toFixed(1).includes(query) ||
       skillData.level.toLowerCase().includes(query)
     );
   });
@@ -139,7 +142,7 @@ const Dashboard = () => {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, volume, style..."
+              placeholder="Search by name, type, tail, fins, volume..."
               className="pl-10 bg-secondary/50 border-white/10 text-heading focus:border-primary/50"
             />
           </div>
@@ -176,8 +179,9 @@ const Dashboard = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBoards.map((board, index) => {
-              const volume = parseFloat(calculateVolume(board.parameters));
-              const skillData = getSkillLevel(volume, board.parameters.length);
+              const volume = boardVolume(board);
+              const skillData = getSkillLevel(volume, board.design.params.length);
+              const { params, colors } = board.design;
               
               return (
                 <motion.div
@@ -204,7 +208,7 @@ const Dashboard = () => {
                        <div className="flex items-center gap-2 text-xs text-white/80">
                          <span>{formatDate(board.createdAt)}</span>
                          <span>•</span>
-                         <span>{volume}L</span>
+                         <span>{volume.toFixed(1)}L</span>
                        </div>
                     </div>
                   </div>
@@ -212,25 +216,30 @@ const Dashboard = () => {
                   <div className="p-5">
                     <div className="flex gap-2 mb-4">
                       <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded bg-white/5 text-white`}>
-                        {board.appearance.texture}
+                        {board.design.typeName}
                       </span>
                       <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded bg-white/5 text-white`}>
                         {skillData.level}
+                      </span>
+                      <span className="ml-auto flex items-center gap-1" title="Deck / bottom / fins">
+                        {[colors.deck, colors.bottom, colors.fins].map((c, i) => (
+                          <span key={i} className="w-3.5 h-3.5 rounded-sm border border-white/20" style={{ backgroundColor: c }} />
+                        ))}
                       </span>
                     </div>
 
                     <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground mb-6">
                       <div className="flex flex-col">
                         <span className="text-white/40 mb-1">Length</span>
-                        <span className="font-mono text-heading">{board.parameters.length}cm</span>
+                        <span className="font-mono text-heading">{formatFeetInches(params.length)}</span>
                       </div>
                       <div className="flex flex-col">
                          <span className="text-white/40 mb-1">Width</span>
-                         <span className="font-mono text-heading">{board.parameters.width}cm</span>
+                         <span className="font-mono text-heading">{formatInches(params.width)}</span>
                       </div>
                       <div className="flex flex-col">
                          <span className="text-white/40 mb-1">Thick</span>
-                         <span className="font-mono text-heading">{board.parameters.thickness}cm</span>
+                         <span className="font-mono text-heading">{formatInches(params.thickness)}</span>
                       </div>
                     </div>
 

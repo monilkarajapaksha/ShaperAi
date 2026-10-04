@@ -105,3 +105,10 @@
     letter-spacing: -0.05em;
   }
 }
+
+/* <surfboard-builder> fills its wrapper; on narrow screens it stacks and grows with its content
+   (same sizing as the reference "Surfboard Builder.html"). */
+surfboard-builder { display: block; height: 100%; }
+@media (max-width: 720px) {
+  surfboard-builder { height: auto; min-height: 100vh; }
+}
