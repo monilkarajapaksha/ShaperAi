@@ -14,9 +14,8 @@ interface SurfboardConfiguratorProps {
   onBack?: () => void;
 }
 
-// Builder (Modernist) palette so the page chrome matches the configurator.
-const INK = "#201e1d";
-const ACCENT = "#ec3013";
+// AEROFORM dark / ocean palette (matches the app theme and the builder tokens in index.css).
+const ACCENT = "hsl(200 80% 50%)";
 
 const PARAM_LABELS: Record<keyof BoardParams, string> = {
   length: "Length", width: "Width", thickness: "Thickness", noseWidth: "Nose width", tailWidth: "Tail width",
@@ -167,20 +166,20 @@ export default function SurfboardConfigurator({ boardId, isEditMode = false, onB
   return (
     <div
       className="min-h-screen md:h-screen flex flex-col md:overflow-hidden"
-      style={{ background: "#f3f2f2", color: INK, fontFamily: '"Archivo", system-ui, sans-serif' }}
+      style={{ background: "hsl(0 0% 2%)", color: "hsl(0 0% 96%)", fontFamily: '"Inter", system-ui, sans-serif' }}
     >
       {/* App bar */}
-      <header className="flex flex-wrap items-center gap-3 px-4 py-3 border-b-2 border-[#201e1d]/40">
+      <header className="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-white/10 bg-[hsl(0_0%_4%)]">
         <button
           type="button"
           onClick={handleBack}
-          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-extrabold border border-[#201e1d]/40 hover:bg-[#201e1d]/[0.07]"
+          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-white/15 text-white/80 hover:text-white hover:bg-white/[0.07] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Dashboard
         </button>
         <div className="flex flex-col min-w-[200px] flex-1 max-w-md">
-          <label htmlFor="board-name" className="text-[11px] uppercase tracking-[0.08em] text-[#605d5d]">
+          <label htmlFor="board-name" className="text-[11px] uppercase tracking-[0.08em] text-white/50">
             {isEditMode ? "Edit design" : "New design"}
           </label>
           <input
@@ -188,18 +187,18 @@ export default function SurfboardConfigurator({ boardId, isEditMode = false, onB
             value={boardName}
             onChange={(e) => setBoardName(e.target.value)}
             placeholder="Board name"
-            className="bg-transparent text-lg font-extrabold outline-none border-b border-transparent focus:border-[#ec3013] placeholder:text-[#9b9797]"
+            className="bg-transparent text-lg font-semibold tracking-tight outline-none border-b border-transparent focus:border-primary placeholder:text-white/30"
           />
         </div>
         <div className="ml-auto flex items-center gap-3">
-          <span className="text-xs text-[#605d5d] tabular-nums" role="status" aria-live="polite">
+          <span className="text-xs text-white/50 tabular-nums" role="status" aria-live="polite">
             {!ready ? "Loading builder…" : isDirty ? "Unsaved changes" : "All changes saved"}
           </span>
           <button
             type="button"
             onClick={handleSave}
             disabled={!ready || isSaving || (!isDirty && !!board)}
-            className="px-4 py-2 text-sm font-extrabold text-[#f3f2f2] disabled:opacity-45 disabled:cursor-not-allowed hover:brightness-95"
+            className="px-4 py-2 text-sm font-semibold rounded-lg text-[hsl(0_0%_2%)] shadow-[0_0_24px_hsl(200_80%_50%/0.25)] disabled:opacity-45 disabled:shadow-none disabled:cursor-not-allowed hover:brightness-110 transition"
             style={{ background: ACCENT }}
           >
             {isSaving ? "Saving…" : "Save design"}
@@ -208,7 +207,7 @@ export default function SurfboardConfigurator({ boardId, isEditMode = false, onB
       </header>
 
       {/* AI refinement */}
-      <section className="px-4 py-3 border-b-2 border-[#201e1d]/40 bg-[#eae9e9]">
+      <section className="px-4 py-3 border-b border-white/10 bg-[hsl(210_12%_7%)]">
         <form
           className="flex flex-wrap items-center gap-3"
           onSubmit={(e) => {
@@ -216,7 +215,7 @@ export default function SurfboardConfigurator({ boardId, isEditMode = false, onB
             handleRefineBoard();
           }}
         >
-          <span className="inline-flex items-center gap-2 text-[13px] font-extrabold uppercase tracking-[0.08em]">
+          <span className="inline-flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.08em] text-white/90">
             <Sparkles className="w-4 h-4" style={{ color: ACCENT }} />
             AI shaper
           </span>
@@ -225,12 +224,12 @@ export default function SurfboardConfigurator({ boardId, isEditMode = false, onB
             onChange={(e) => setRefinementInput(e.target.value)}
             disabled={!ready || isRefining}
             placeholder={`e.g. "More paddle power for small waves" or "Make it looser in steep surf"`}
-            className="flex-1 min-w-[220px] h-9 px-3 text-sm bg-[#f3f2f2] border border-[#201e1d]/40 outline-none focus:border-[#ec3013]"
+            className="flex-1 min-w-[220px] h-9 px-3 text-sm rounded-lg bg-[hsl(0_0%_2%)] text-white border border-white/15 outline-none placeholder:text-white/30 focus:border-primary focus:ring-1 focus:ring-primary/40"
           />
           <button
             type="submit"
             disabled={!ready || isRefining || !refinementInput.trim()}
-            className="inline-flex items-center gap-2 h-9 px-4 text-sm font-extrabold border border-[#201e1d]/40 hover:bg-[#201e1d]/[0.07] disabled:opacity-45 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 h-9 px-4 text-sm font-medium rounded-lg border border-white/15 text-white/90 hover:bg-white/[0.07] transition-colors disabled:opacity-45 disabled:cursor-not-allowed"
           >
             {isRefining && <Loader2 className="w-4 h-4 animate-spin" />}
             {isRefining ? "Refining…" : "Refine shape"}
@@ -248,7 +247,7 @@ export default function SurfboardConfigurator({ boardId, isEditMode = false, onB
           )}
         </form>
         {showReasoning && (reasoning || targetVolume) && (
-          <div className="mt-2 text-[13px] leading-relaxed text-[#444141] max-w-5xl">
+          <div className="mt-2 text-[13px] leading-relaxed text-white/70 max-w-5xl">
             {targetVolume && design && (
               <p className="mb-1 tabular-nums">
                 AI target volume <b>{targetVolume.toFixed(1)} L</b> · current <b>{design.computed.volumeLiters.toFixed(1)} L</b>
