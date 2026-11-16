@@ -1,0 +1,16 @@
+﻿Term,What it means (plain English),How it is measured / options,Why it matters for the AI
+Length,"How long the board is, tip of the nose to end of the tail.",Feet and inches. Numeric columns use inches.,"Sets paddle power, speed and what waves the board suits."
+Width,"Widest point of the board, measured across the deck.",Inches.,"More width = more stability and paddle power, less tightness in turns."
+Thickness,"How thick the board is at its thickest point, usually near the middle.",Inches.,Thicker = more float and buoyancy. Thin = more sensitive and responsive.
+Volume,"Total space the board takes up, which decides how much it floats.",Litres.,The most important number for matching board to surfer weight and skill.
+"Nose width @12""",Width of the board 12 inches back from the tip of the nose.,Inches.,"Wider = more paddle power and glide, narrower = a more pointed, performance outline."
+"Tail width @12""",Width of the board 12 inches in from the end of the tail.,Inches.,Wider tail = more speed and lift in small surf. Narrower = more hold and control.
+Nose rocker,How much the nose curves up from a flat surface.,"Height of the nose tip above a flat surface, in inches.","More nose rocker = easier steep drops, less speed. Less = faster and flatter."
+Tail rocker,How much the tail curves up from a flat surface.,"Height of the tail end above a flat surface, in inches.","More tail rocker = tighter turns, less drive. Less = faster."
+Wide point,The location of the board's widest point.,"Distance from center. Forward = toward the nose, back = toward the tail.",Forward wide point = more glide. Centered or back = tighter turns.
+Rails,"The edges of the board. Full rails are thick and round, thin rails are slim and sharp.","Often described as a ratio, e.g. 60/40 or 50/50.","Full rails float and forgive. Thin, hard rails grip and turn."
+Rail edge,How sharp the edge is where the bottom meets the rail.,"Soft (rounded), medium, hard (sharp).",Harder edge in the tail = more hold and speed. Soft = more forgiving.
+Bottom contour,The shape of the underside of the board.,"Flat, single concave (a shallow scoop), double concave (two scoops), vee (a roof-shaped ridge).",Concave adds lift and speed. Vee helps rail-to-rail transitions.
+Tail shape,The shape of the end of the board.,"Squash, round, round pin, pin, swallow, rounded square, wing.","Affects hold, speed and release. Wide tails are looser, pinned tails hold in power."
+Nose shape,The shape of the tip of the board.,"Pointed, slightly pointed, rounded, wide rounded.",Pointed = performance. Wide rounded = glide and stability.
+Fin setup,How many fins the board has and how they are arranged.,"Single, twin, twin keel, 2+1, thruster (3), quad (4), 5-fin.","Controls drive, pivot and hold."

@@ -1,0 +1,5 @@
+# Copy this file to .dev.vars and add your actual API key.
+# .dev.vars is gitignored and used for local development only.
+# In production, set it as an encrypted Cloudflare secret: npx wrangler secret put OPENROUTER_API_KEY
+
+OPENROUTER_API_KEY=your-openrouter-api-key-here

@@ -1,0 +1,1014 @@
+{
+ "models": [
+  {
+   "id": "SB-01",
+   "family": "Shortboard",
+   "model": "Performance shortboard",
+   "typicalLength": "5'8\" - 6'4\"",
+   "english": {
+    "whatItIs": "The all-round modern shortboard. Pointed nose, narrow-ish outline, thin and low-volume so it sits low in the water and turns on a dime. Built for surfers who want to snap, carve and generate their own speed on a wave with some shape and push. Not forgiving: it needs good paddle fitness and a decent wave.",
+    "feel": "Responsive, quick rail-to-rail, lively. Rewards good technique.",
+    "bestWaves": "Good-quality 2-6ft+ waves with some power: beach breaks, points, reefs.",
+    "surferLevel": "Intermediate to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 68,
+     "max": 76
+    },
+    "width": {
+     "min": 18.5,
+     "max": 19.5
+    },
+    "thickness": {
+     "min": 2.25,
+     "max": 2.5
+    },
+    "volumeL": {
+     "min": 26,
+     "max": 32
+    },
+    "noseWidth": {
+     "min": 12.25,
+     "max": 13.25
+    },
+    "tailWidth": {
+     "min": 14.25,
+     "max": 15.25
+    },
+    "noseRocker": {
+     "min": 4.5,
+     "max": 5.25
+    },
+    "tailRocker": {
+     "min": 2,
+     "max": 2.75
+    }
+   },
+   "shape": {
+    "widePoint": "Centered to 1-2\" forward of center",
+    "rails": "Medium. Roughly 60/40 near the nose, 50/50 in the middle, hard edge toward the tail.",
+    "bottom": "Single concave through the front, blending to double concave or slight vee off the tail.",
+    "tail": "Squash, round, round pin, rounded square",
+    "nose": "Pointed to slightly rounded",
+    "fins": "Thruster (3)"
+   }
+  },
+  {
+   "id": "SB-02",
+   "family": "Shortboard",
+   "model": "Pro / competition shortboard",
+   "typicalLength": "5'7\" - 6'2\"",
+   "english": {
+    "whatItIs": "Lowest volume and thinnest shortboard family. Designed for expert surfers in good waves who want maximum control and vertical, critical surfing. Thin rails, hard edges in the tail and a smooth continuous curve. Very unforgiving for anyone who is not strong and fit.",
+    "feel": "Very sharp and precise, high-speed, critical. Nothing is forgiving.",
+    "bestWaves": "Quality, powerful 3-8ft faces.",
+    "surferLevel": "Advanced to Expert"
+   },
+   "ranges": {
+    "length": {
+     "min": 67,
+     "max": 74
+    },
+    "width": {
+     "min": 18.25,
+     "max": 19
+    },
+    "thickness": {
+     "min": 2.15,
+     "max": 2.4
+    },
+    "volumeL": {
+     "min": 23,
+     "max": 29
+    },
+    "noseWidth": {
+     "min": 12,
+     "max": 12.75
+    },
+    "tailWidth": {
+     "min": 14,
+     "max": 14.75
+    },
+    "noseRocker": {
+     "min": 4.5,
+     "max": 5
+    },
+    "tailRocker": {
+     "min": 2,
+     "max": 2.5
+    }
+   },
+   "shape": {
+    "widePoint": "Centered to 1\" forward of center",
+    "rails": "Thin and low. 50/50 with a hard, sharp edge from mid-board to tail.",
+    "bottom": "Single concave blending to double concave, sometimes slight vee in the tail.",
+    "tail": "Squash, round pin, rounded square",
+    "nose": "Pointed",
+    "fins": "Thruster (3)"
+   }
+  },
+  {
+   "id": "SB-03",
+   "family": "Shortboard",
+   "model": "Groveler (small-wave shortboard)",
+   "typicalLength": "5'4\" - 6'0\"",
+   "english": {
+    "whatItIs": "A short, wide, thick, flat board made to generate speed in weak or small waves. Fuller nose and wide tail give lots of area and float, so it planes up early. Loses precision in bigger or steeper surf.",
+    "feel": "Loose, playful, fast off the mark, forgiving. Less hold when waves get powerful.",
+    "bestWaves": "Small, weak or mushy 1-3ft.",
+    "surferLevel": "Beginner-Intermediate to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 64,
+     "max": 72
+    },
+    "width": {
+     "min": 19.5,
+     "max": 21
+    },
+    "thickness": {
+     "min": 2.4,
+     "max": 2.75
+    },
+    "volumeL": {
+     "min": 29,
+     "max": 38
+    },
+    "noseWidth": {
+     "min": 13.5,
+     "max": 15
+    },
+    "tailWidth": {
+     "min": 15.5,
+     "max": 17
+    },
+    "noseRocker": {
+     "min": 4,
+     "max": 4.75
+    },
+    "tailRocker": {
+     "min": 1.75,
+     "max": 2.25
+    }
+   },
+   "shape": {
+    "widePoint": "Forward of center, 1-3\" ahead",
+    "rails": "Fuller. 60/40 to 50/50, soft to medium edge.",
+    "bottom": "Single concave, or flat entry with slight vee out the tail.",
+    "tail": "Wide squash, round, swallow, wing",
+    "nose": "Rounded to semi-round",
+    "fins": "Thruster, quad or 5-fin"
+   }
+  },
+  {
+   "id": "SB-04",
+   "family": "Step-up",
+   "model": "Step-up",
+   "typicalLength": "6'0\" - 7'0\"",
+   "english": {
+    "whatItIs": "A performance shortboard made longer, thicker and narrower with more rocker so it paddles into bigger, steeper and faster waves and holds a line. The tail is pulled in for control. Same shape language as a shortboard, scaled up for power.",
+    "feel": "Stable, drives down the line, holds in steep and powerful sections.",
+    "bestWaves": "Steep, powerful, hollow 5-10ft.",
+    "surferLevel": "Advanced to Expert"
+   },
+   "ranges": {
+    "length": {
+     "min": 72,
+     "max": 84
+    },
+    "width": {
+     "min": 18.5,
+     "max": 19.5
+    },
+    "thickness": {
+     "min": 2.4,
+     "max": 2.8
+    },
+    "volumeL": {
+     "min": 30,
+     "max": 40
+    },
+    "noseWidth": {
+     "min": 12,
+     "max": 13
+    },
+    "tailWidth": {
+     "min": 13.5,
+     "max": 14.5
+    },
+    "noseRocker": {
+     "min": 5,
+     "max": 6
+    },
+    "tailRocker": {
+     "min": 2.5,
+     "max": 3.25
+    }
+   },
+   "shape": {
+    "widePoint": "Centered to slightly back",
+    "rails": "Thicker. 60/40 to 50/50, soft-medium edge up front, hard edge in the tail for hold.",
+    "bottom": "Single concave, double concave or vee through the tail.",
+    "tail": "Round pin, pin, rounded square",
+    "nose": "Pointed",
+    "fins": "Thruster (sometimes quad)"
+   }
+  },
+  {
+   "id": "SB-05",
+   "family": "Fish",
+   "model": "Retro fish (twin keel)",
+   "typicalLength": "5'0\" - 5'10\"",
+   "english": {
+    "whatItIs": "The original fish: short, wide and flat, with a wide swallow tail and big twin keel fins. Floats and paddles easily and is super fast down the line in small waves. Feels skatey and loose rather than tight, and has less hold in steep waves.",
+    "feel": "Fast, slippery, flowy, smooth. Skates down the line.",
+    "bestWaves": "Small to medium 1-4ft, weak or mushy.",
+    "surferLevel": "Beginner-Intermediate to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 60,
+     "max": 70
+    },
+    "width": {
+     "min": 20.5,
+     "max": 22
+    },
+    "thickness": {
+     "min": 2.4,
+     "max": 2.75
+    },
+    "volumeL": {
+     "min": 30,
+     "max": 38
+    },
+    "noseWidth": {
+     "min": 15,
+     "max": 16.5
+    },
+    "tailWidth": {
+     "min": 16,
+     "max": 17.5
+    },
+    "noseRocker": {
+     "min": 4,
+     "max": 4.5
+    },
+    "tailRocker": {
+     "min": 1.5,
+     "max": 2
+    }
+   },
+   "shape": {
+    "widePoint": "Forward of center, 2-4\" ahead",
+    "rails": "Full, mostly 50/50, soft edge.",
+    "bottom": "Flat to shallow single concave.",
+    "tail": "Swallow with a deep notch",
+    "nose": "Wide, rounded",
+    "fins": "Twin keel (2)"
+   }
+  },
+  {
+   "id": "SB-06",
+   "family": "Fish",
+   "model": "Performance fish",
+   "typicalLength": "5'4\" - 6'0\"",
+   "english": {
+    "whatItIs": "A modern fish with the speed of a fish and more performance. Slightly narrower, thinner and with more rocker than a retro fish, with a shallower swallow notch. Turns more tightly while keeping the glide and paddle power.",
+    "feel": "Quick and lively but still smooth. More control than a retro fish.",
+    "bestWaves": "Good-quality 2-5ft, small to medium.",
+    "surferLevel": "Intermediate to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 64,
+     "max": 72
+    },
+    "width": {
+     "min": 19.75,
+     "max": 20.75
+    },
+    "thickness": {
+     "min": 2.3,
+     "max": 2.6
+    },
+    "volumeL": {
+     "min": 28,
+     "max": 35
+    },
+    "noseWidth": {
+     "min": 13.5,
+     "max": 14.75
+    },
+    "tailWidth": {
+     "min": 15,
+     "max": 16.25
+    },
+    "noseRocker": {
+     "min": 4.25,
+     "max": 5
+    },
+    "tailRocker": {
+     "min": 1.75,
+     "max": 2.5
+    }
+   },
+   "shape": {
+    "widePoint": "Slightly forward of center, 1-2\" ahead",
+    "rails": "Medium. 60/40 with a harder edge toward the tail.",
+    "bottom": "Single concave into double concave.",
+    "tail": "Swallow with shallower notch, or round swallow",
+    "nose": "Slightly pointed to rounded",
+    "fins": "Twin + stabilizer, thruster, or quad"
+   }
+  },
+  {
+   "id": "SB-07",
+   "family": "Fish",
+   "model": "Quad fish",
+   "typicalLength": "5'2\" - 6'0\"",
+   "english": {
+    "whatItIs": "A fish outline with four fins. The quad setup gives more drive and speed down the line and a looser release off the rail. Great in fast, hollow-ish small waves.",
+    "feel": "Drivey, fast, smooth. Less pivot than a thruster, more speed.",
+    "bestWaves": "Fast 2-5ft, from slow to hollow lines.",
+    "surferLevel": "Intermediate to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 62,
+     "max": 72
+    },
+    "width": {
+     "min": 20,
+     "max": 21.5
+    },
+    "thickness": {
+     "min": 2.4,
+     "max": 2.7
+    },
+    "volumeL": {
+     "min": 30,
+     "max": 37
+    },
+    "noseWidth": {
+     "min": 14,
+     "max": 15.5
+    },
+    "tailWidth": {
+     "min": 15.5,
+     "max": 17
+    },
+    "noseRocker": {
+     "min": 4,
+     "max": 4.75
+    },
+    "tailRocker": {
+     "min": 1.75,
+     "max": 2.25
+    }
+   },
+   "shape": {
+    "widePoint": "Forward of center, 1-3\" ahead",
+    "rails": "Medium-full. 60/40 to 50/50, softer edges.",
+    "bottom": "Flat to single concave, sometimes double concave.",
+    "tail": "Swallow or round swallow (shallow notch)",
+    "nose": "Rounded",
+    "fins": "Quad (4)"
+   }
+  },
+  {
+   "id": "SB-08",
+   "family": "Hybrid",
+   "model": "Shortboard-fish hybrid",
+   "typicalLength": "5'6\" - 6'4\"",
+   "english": {
+    "whatItIs": "A blend of a shortboard and a fish: shortboard pointed-ish nose and rocker with fish-like width, volume and a short tail. A very forgiving step down from a bigger board for improving surfers while still being able to turn.",
+    "feel": "Easy, forgiving, lively. Good in most small-wave conditions.",
+    "bestWaves": "Wide range, 1-4ft, mushy to decent.",
+    "surferLevel": "Intermediate to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 66,
+     "max": 76
+    },
+    "width": {
+     "min": 19.5,
+     "max": 20.75
+    },
+    "thickness": {
+     "min": 2.35,
+     "max": 2.65
+    },
+    "volumeL": {
+     "min": 30,
+     "max": 38
+    },
+    "noseWidth": {
+     "min": 13,
+     "max": 14.5
+    },
+    "tailWidth": {
+     "min": 14.75,
+     "max": 16.25
+    },
+    "noseRocker": {
+     "min": 4.25,
+     "max": 5
+    },
+    "tailRocker": {
+     "min": 1.9,
+     "max": 2.5
+    }
+   },
+   "shape": {
+    "widePoint": "Centered to 1-2\" forward of center",
+    "rails": "Medium. Roughly 60/40, edge in the tail.",
+    "bottom": "Single concave blending to double concave.",
+    "tail": "Squash, round, shallow swallow",
+    "nose": "Slightly pointed to rounded",
+    "fins": "Thruster or quad"
+   }
+  },
+  {
+   "id": "SB-09",
+   "family": "Hybrid",
+   "model": "Fun hybrid (mid-size hybrid)",
+   "typicalLength": "5'10\" - 7'0\"",
+   "english": {
+    "whatItIs": "A longer, thicker, forgiving board with a mix of shortboard and funboard traits: round-ish nose, a lot of volume and an easy paddle. Great for getting waves, learning to turn and progressing.",
+    "feel": "Stable, easy to catch waves, relaxed turns.",
+    "bestWaves": "Small to medium 1-4ft, weak or mushy.",
+    "surferLevel": "Beginner to Intermediate"
+   },
+   "ranges": {
+    "length": {
+     "min": 70,
+     "max": 84
+    },
+    "width": {
+     "min": 20.5,
+     "max": 22
+    },
+    "thickness": {
+     "min": 2.6,
+     "max": 3
+    },
+    "volumeL": {
+     "min": 38,
+     "max": 50
+    },
+    "noseWidth": {
+     "min": 14.5,
+     "max": 16.5
+    },
+    "tailWidth": {
+     "min": 15.5,
+     "max": 17
+    },
+    "noseRocker": {
+     "min": 4.25,
+     "max": 5.25
+    },
+    "tailRocker": {
+     "min": 2,
+     "max": 2.75
+    }
+   },
+   "shape": {
+    "widePoint": "Slightly forward of center",
+    "rails": "Fuller. 60/40 to 50/50, soft edge.",
+    "bottom": "Single concave, or flat entry with vee out the tail.",
+    "tail": "Squash, round, round pin",
+    "nose": "Rounded",
+    "fins": "Thruster or 2+1"
+   }
+  },
+  {
+   "id": "SB-10",
+   "family": "Mid-length",
+   "model": "Egg",
+   "typicalLength": "6'0\" - 7'6\"",
+   "english": {
+    "whatItIs": "A smooth, egg-shaped board with a rounded nose and tail and a fuller middle. Easy to paddle and glides long, flowing lines. A relaxed, stylish ride that is easier than a shortboard and more turnable than a longboard.",
+    "feel": "Smooth, flowy, forgiving, stylish.",
+    "bestWaves": "Clean, smooth, small to medium waves, 1-4ft.",
+    "surferLevel": "Beginner to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 72,
+     "max": 90
+    },
+    "width": {
+     "min": 20.75,
+     "max": 22.5
+    },
+    "thickness": {
+     "min": 2.6,
+     "max": 3
+    },
+    "volumeL": {
+     "min": 38,
+     "max": 52
+    },
+    "noseWidth": {
+     "min": 15,
+     "max": 17
+    },
+    "tailWidth": {
+     "min": 14.5,
+     "max": 16.5
+    },
+    "noseRocker": {
+     "min": 4.5,
+     "max": 5.5
+    },
+    "tailRocker": {
+     "min": 2,
+     "max": 2.75
+    }
+   },
+   "shape": {
+    "widePoint": "Forward of center, 2-4\" ahead",
+    "rails": "Fairly full and rounded, 60/40 to 50/50, edge in the tail.",
+    "bottom": "Flat or slight single concave, vee off the tail.",
+    "tail": "Round or round pin",
+    "nose": "Rounded (egg-shaped, pulled)",
+    "fins": "Single, twin, thruster or 2+1"
+   }
+  },
+  {
+   "id": "SB-11",
+   "family": "Mid-length",
+   "model": "Mid-length single fin",
+   "typicalLength": "6'6\" - 8'0\"",
+   "english": {
+    "whatItIs": "A retro-style board with one center fin. Glides, flows and draws smooth carved lines instead of snappy turns. Easy to paddle, great for catching waves and surfing with style.",
+    "feel": "Smooth, gliding, drawn-out turns. Very stable.",
+    "bestWaves": "Small, clean to mellow, 1-4ft.",
+    "surferLevel": "All levels"
+   },
+   "ranges": {
+    "length": {
+     "min": 78,
+     "max": 96
+    },
+    "width": {
+     "min": 20.75,
+     "max": 22.5
+    },
+    "thickness": {
+     "min": 2.6,
+     "max": 3
+    },
+    "volumeL": {
+     "min": 40,
+     "max": 55
+    },
+    "noseWidth": {
+     "min": 15,
+     "max": 17
+    },
+    "tailWidth": {
+     "min": 13.5,
+     "max": 15.5
+    },
+    "noseRocker": {
+     "min": 4.5,
+     "max": 5.5
+    },
+    "tailRocker": {
+     "min": 2.5,
+     "max": 3
+    }
+   },
+   "shape": {
+    "widePoint": "Centered to 0-3\" forward",
+    "rails": "Rounded, fairly full 50/50, edge from mid to tail.",
+    "bottom": "Flat to slight vee, sometimes slight concave in the nose.",
+    "tail": "Round or round pin",
+    "nose": "Rounded",
+    "fins": "Single fin (box or center)"
+   }
+  },
+  {
+   "id": "SB-12",
+   "family": "Mid-length",
+   "model": "Mid-length 2+1",
+   "typicalLength": "6'6\" - 8'0\"",
+   "english": {
+    "whatItIs": "A mid-length with a center fin and two small side fins. Keeps the glide and flow of a single fin but adds hold and a little extra drive and control.",
+    "feel": "Smooth like a single fin with a bit more hold and drive.",
+    "bestWaves": "Clean 1-4ft+, a touch faster than a single fin.",
+    "surferLevel": "Beginner to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 78,
+     "max": 96
+    },
+    "width": {
+     "min": 20.75,
+     "max": 22.5
+    },
+    "thickness": {
+     "min": 2.65,
+     "max": 3
+    },
+    "volumeL": {
+     "min": 42,
+     "max": 56
+    },
+    "noseWidth": {
+     "min": 15,
+     "max": 17
+    },
+    "tailWidth": {
+     "min": 14,
+     "max": 16
+    },
+    "noseRocker": {
+     "min": 4.5,
+     "max": 5.5
+    },
+    "tailRocker": {
+     "min": 2.5,
+     "max": 3
+    }
+   },
+   "shape": {
+    "widePoint": "Centered to 0-3\" forward",
+    "rails": "Rounded. 50/50 to 60/40, edge from mid to tail.",
+    "bottom": "Flat to vee with a gentle single concave.",
+    "tail": "Round, round pin, squash",
+    "nose": "Rounded",
+    "fins": "2+1 (center + 2 side fins)"
+   }
+  },
+  {
+   "id": "SB-13",
+   "family": "Funboard",
+   "model": "Funboard / mini-mal",
+   "typicalLength": "7'0\" - 8'0\"",
+   "english": {
+    "whatItIs": "A shorter, more manageable version of a longboard. Wide, thick and full, so it paddles easily, catches waves early and is very stable. The standard choice for surfers who want an easy, forgiving board that is still fun to turn.",
+    "feel": "Stable, easy to paddle, forgiving, fun.",
+    "bestWaves": "Small to medium 1-4ft, mushy to clean.",
+    "surferLevel": "Beginner to Intermediate"
+   },
+   "ranges": {
+    "length": {
+     "min": 84,
+     "max": 96
+    },
+    "width": {
+     "min": 21,
+     "max": 22.5
+    },
+    "thickness": {
+     "min": 2.75,
+     "max": 3.1
+    },
+    "volumeL": {
+     "min": 45,
+     "max": 65
+    },
+    "noseWidth": {
+     "min": 15.5,
+     "max": 17.5
+    },
+    "tailWidth": {
+     "min": 14,
+     "max": 15.5
+    },
+    "noseRocker": {
+     "min": 4.75,
+     "max": 5.75
+    },
+    "tailRocker": {
+     "min": 2.5,
+     "max": 3.25
+    }
+   },
+   "shape": {
+    "widePoint": "Centered to slightly forward",
+    "rails": "Full and rounded, roughly 50/50.",
+    "bottom": "Flat with a slight vee.",
+    "tail": "Round, round pin, squash",
+    "nose": "Rounded",
+    "fins": "2+1 or thruster"
+   }
+  },
+  {
+   "id": "SB-14",
+   "family": "Funboard",
+   "model": "Soft-top learner",
+   "typicalLength": "7'0\" - 8'6\"",
+   "english": {
+    "whatItIs": "A foam-covered board for first-time and early surfers. Very wide, thick and buoyant with a soft deck, so it is easy to stand on and safe in the water. Built for catching whitewater and small waves, not for performance.",
+    "feel": "Maximum stability and safety. Not responsive.",
+    "bestWaves": "Whitewater to small 1-3ft.",
+    "surferLevel": "Absolute beginner"
+   },
+   "ranges": {
+    "length": {
+     "min": 84,
+     "max": 102
+    },
+    "width": {
+     "min": 22,
+     "max": 23.5
+    },
+    "thickness": {
+     "min": 3,
+     "max": 3.25
+    },
+    "volumeL": {
+     "min": 55,
+     "max": 85
+    },
+    "noseWidth": {
+     "min": 16,
+     "max": 18
+    },
+    "tailWidth": {
+     "min": 14.5,
+     "max": 16
+    },
+    "noseRocker": {
+     "min": 4.5,
+     "max": 5.5
+    },
+    "tailRocker": {
+     "min": 2.5,
+     "max": 3
+    }
+   },
+   "shape": {
+    "widePoint": "Centered",
+    "rails": "Very full, round, soft foam rails.",
+    "bottom": "Flat, sometimes a light vee.",
+    "tail": "Round, squash",
+    "nose": "Rounded",
+    "fins": "Thruster (flex fins) or 2+1"
+   }
+  },
+  {
+   "id": "SB-15",
+   "family": "Longboard",
+   "model": "Classic / traditional logger",
+   "typicalLength": "9'0\" - 9'6\"",
+   "english": {
+    "whatItIs": "The traditional longboard: long, heavy, wide and thick. Has a single center fin, soft rails and a rounded nose. Made for glide, trim and walking the board in clean small waves. Slow to turn but very stable and smooth.",
+    "feel": "Gliding, trimming, relaxed. Slow to turn.",
+    "bestWaves": "Small, clean, mellow 1-4ft. Point breaks.",
+    "surferLevel": "Beginner to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 108,
+     "max": 114
+    },
+    "width": {
+     "min": 22.5,
+     "max": 23.5
+    },
+    "thickness": {
+     "min": 2.75,
+     "max": 3.1
+    },
+    "volumeL": {
+     "min": 65,
+     "max": 85
+    },
+    "noseWidth": {
+     "min": 17,
+     "max": 19
+    },
+    "tailWidth": {
+     "min": 14.5,
+     "max": 16
+    },
+    "noseRocker": {
+     "min": 5.5,
+     "max": 7
+    },
+    "tailRocker": {
+     "min": 3,
+     "max": 4
+    }
+   },
+   "shape": {
+    "widePoint": "Centered to slightly forward",
+    "rails": "Soft, rolled 50/50 through the nose, harder edge in the last third.",
+    "bottom": "Flat with a slight vee. Nose may have slight concave.",
+    "tail": "Round, round pin, squash",
+    "nose": "Rounded",
+    "fins": "Single fin (9-10\")"
+   }
+  },
+  {
+   "id": "SB-16",
+   "family": "Longboard",
+   "model": "Performance longboard",
+   "typicalLength": "8'6\" - 9'2\"",
+   "english": {
+    "whatItIs": "A lighter, narrower, more rockered longboard made for turning. Thinner rails and a pulled-in tail let it surf more like a big shortboard than a classic log.",
+    "feel": "Turny, responsive, lively. Surfs rail to rail.",
+    "bestWaves": "Good-quality 2-5ft. Points and reefs.",
+    "surferLevel": "Intermediate to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 102,
+     "max": 110
+    },
+    "width": {
+     "min": 21.5,
+     "max": 22.5
+    },
+    "thickness": {
+     "min": 2.5,
+     "max": 2.9
+    },
+    "volumeL": {
+     "min": 52,
+     "max": 68
+    },
+    "noseWidth": {
+     "min": 15.5,
+     "max": 17.5
+    },
+    "tailWidth": {
+     "min": 13.5,
+     "max": 15
+    },
+    "noseRocker": {
+     "min": 5,
+     "max": 6
+    },
+    "tailRocker": {
+     "min": 3,
+     "max": 3.5
+    }
+   },
+   "shape": {
+    "widePoint": "Centered",
+    "rails": "Thinner. 60/40 to 50/50, hard edge in the tail.",
+    "bottom": "Vee in the tail with slight concave through the middle.",
+    "tail": "Pinned, round pin",
+    "nose": "Narrower, pointed-rounded",
+    "fins": "2+1 or thruster"
+   }
+  },
+  {
+   "id": "SB-17",
+   "family": "Longboard",
+   "model": "Noserider",
+   "typicalLength": "9'0\" - 9'8\"",
+   "english": {
+    "whatItIs": "A longboard made for nose riding: a wide, concave nose, a wide-ish tail and a bigger single fin. The shape holds the surfer up on the nose while the board glides.",
+    "feel": "Stable and glidey. Nose walking is the point.",
+    "bestWaves": "Small, clean, mellow 1-3ft. Long point waves.",
+    "surferLevel": "Intermediate to Advanced"
+   },
+   "ranges": {
+    "length": {
+     "min": 108,
+     "max": 116
+    },
+    "width": {
+     "min": 22.75,
+     "max": 23.75
+    },
+    "thickness": {
+     "min": 2.75,
+     "max": 3.1
+    },
+    "volumeL": {
+     "min": 68,
+     "max": 90
+    },
+    "noseWidth": {
+     "min": 18,
+     "max": 20
+    },
+    "tailWidth": {
+     "min": 15,
+     "max": 16.5
+    },
+    "noseRocker": {
+     "min": 4.5,
+     "max": 5.5
+    },
+    "tailRocker": {
+     "min": 3,
+     "max": 3.75
+    }
+   },
+   "shape": {
+    "widePoint": "Centered",
+    "rails": "Soft, rolled 50/50 in the front, harder edges in the tail.",
+    "bottom": "Concave in the nose, flat through the middle, vee in the tail.",
+    "tail": "Round pin, pin, round",
+    "nose": "Wide, rounded, slight concave",
+    "fins": "Single fin (large, 9.5-10.5\")"
+   }
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Length",
+   "meaning": "How long the board is, tip of the nose to end of the tail.",
+   "options": "Feet and inches. Numeric columns use inches.",
+   "why": "Sets paddle power, speed and what waves the board suits."
+  },
+  {
+   "term": "Width",
+   "meaning": "Widest point of the board, measured across the deck.",
+   "options": "Inches.",
+   "why": "More width = more stability and paddle power, less tightness in turns."
+  },
+  {
+   "term": "Thickness",
+   "meaning": "How thick the board is at its thickest point, usually near the middle.",
+   "options": "Inches.",
+   "why": "Thicker = more float and buoyancy. Thin = more sensitive and responsive."
+  },
+  {
+   "term": "Volume",
+   "meaning": "Total space the board takes up, which decides how much it floats.",
+   "options": "Litres.",
+   "why": "The most important number for matching board to surfer weight and skill."
+  },
+  {
+   "term": "Nose width @12\"",
+   "meaning": "Width of the board 12 inches back from the tip of the nose.",
+   "options": "Inches.",
+   "why": "Wider = more paddle power and glide, narrower = a more pointed, performance outline."
+  },
+  {
+   "term": "Tail width @12\"",
+   "meaning": "Width of the board 12 inches in from the end of the tail.",
+   "options": "Inches.",
+   "why": "Wider tail = more speed and lift in small surf. Narrower = more hold and control."
+  },
+  {
+   "term": "Nose rocker",
+   "meaning": "How much the nose curves up from a flat surface.",
+   "options": "Height of the nose tip above a flat surface, in inches.",
+   "why": "More nose rocker = easier steep drops, less speed. Less = faster and flatter."
+  },
+  {
+   "term": "Tail rocker",
+   "meaning": "How much the tail curves up from a flat surface.",
+   "options": "Height of the tail end above a flat surface, in inches.",
+   "why": "More tail rocker = tighter turns, less drive. Less = faster."
+  },
+  {
+   "term": "Wide point",
+   "meaning": "The location of the board's widest point.",
+   "options": "Distance from center. Forward = toward the nose, back = toward the tail.",
+   "why": "Forward wide point = more glide. Centered or back = tighter turns."
+  },
+  {
+   "term": "Rails",
+   "meaning": "The edges of the board. Full rails are thick and round, thin rails are slim and sharp.",
+   "options": "Often described as a ratio, e.g. 60/40 or 50/50.",
+   "why": "Full rails float and forgive. Thin, hard rails grip and turn."
+  },
+  {
+   "term": "Rail edge",
+   "meaning": "How sharp the edge is where the bottom meets the rail.",
+   "options": "Soft (rounded), medium, hard (sharp).",
+   "why": "Harder edge in the tail = more hold and speed. Soft = more forgiving."
+  },
+  {
+   "term": "Bottom contour",
+   "meaning": "The shape of the underside of the board.",
+   "options": "Flat, single concave (a shallow scoop), double concave (two scoops), vee (a roof-shaped ridge).",
+   "why": "Concave adds lift and speed. Vee helps rail-to-rail transitions."
+  },
+  {
+   "term": "Tail shape",
+   "meaning": "The shape of the end of the board.",
+   "options": "Squash, round, round pin, pin, swallow, rounded square, wing.",
+   "why": "Affects hold, speed and release. Wide tails are looser, pinned tails hold in power."
+  },
+  {
+   "term": "Nose shape",
+   "meaning": "The shape of the tip of the board.",
+   "options": "Pointed, slightly pointed, rounded, wide rounded.",
+   "why": "Pointed = performance. Wide rounded = glide and stability."
+  },
+  {
+   "term": "Fin setup",
+   "meaning": "How many fins the board has and how they are arranged.",
+   "options": "Single, twin, twin keel, 2+1, thruster (3), quad (4), 5-fin.",
+   "why": "Controls drive, pivot and hold."
+  }
+ ]
+}

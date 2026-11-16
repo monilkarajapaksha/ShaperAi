@@ -1,0 +1,20 @@
+{
+  "name": "shaper-backend",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+  },
+  "dependencies": {
+    "hono": "^4.11.4",
+    "@langchain/core": "^0.3.70",
+    "@langchain/openai": "^0.6.7",
+    "langchain": "^0.3.30",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "wrangler": "^4.87.0"
+  }
+}
