@@ -14,6 +14,7 @@ import {
   normalizeParams,
   normalizeType,
 } from "./boardSchema";
+import { englishKnowledge, glossaryKnowledge, measurementContext, retrieveModels } from "./knowledge";
 
 const numericFields = Object.fromEntries(
   Object.entries(NUMERIC_PARAMS).map(([k, r]) => [
@@ -85,6 +86,17 @@ Rules:
 Typical lengths: shortboard 5'6"–6'2" (66–74), groveler/fish 5'2"–5'9" (62–69), egg/hybrid 6'6"–8'0" (78–96),
 mini-mal 7'0"–8'6" (84–102), gun 6'10"–9'0"+ (82–108+), longboard 9'0"–10'0" (108–120).
 
+BOARD MODEL KNOWLEDGE BASE (what each reference board is, how it rides, who it suits).
+Use it to choose the boardType and to explain your reasoning in plain English:
+${englishKnowledge()}
+
+GLOSSARY
+${glossaryKnowledge()}
+
+The surfer may not tell you their style, wave conditions or shape preferences. Infer them from skill, size, weight,
+fitness, frequency and notes, then pick the matching reference model above and choose all shape, rail, tail and fin params yourself.
+Reference measurement ranges are provided with each request; stay inside them unless the surfer's body size clearly requires otherwise.
+
 PARAMETER REFERENCE
 ${describeSchemaForPrompt()}
 `;
@@ -154,9 +166,12 @@ export const generateBoardDesign = async (
       "{requirements}",
       "```",
       "",
+      "CLOSEST REFERENCE MODELS (retrieved from the knowledge base; measurements in inches / litres):",
+      "{reference_models}",
+      "",
       "{format_instructions}",
     ].join("\n"),
-    inputVariables: ["requirements"],
+    inputVariables: ["requirements", "reference_models"],
     partialVariables: {
       format_instructions: parser.getFormatInstructions(),
       system_prompt: systemPrompt,
@@ -168,6 +183,9 @@ export const generateBoardDesign = async (
     .pipe(parser)
     .invoke({
       requirements: JSON.stringify(userDetails),
+      reference_models: measurementContext(
+        retrieveModels((userDetails ?? {}) as Record<string, unknown>),
+      ),
     });
 
   return toResult(
