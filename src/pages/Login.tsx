@@ -6,11 +6,45 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { auth, googleProvider } from "@/lib/firebase";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
+import { useState, FormEvent } from "react";
 import { toast } from "sonner";
+
+const authErrorMessage = (error: unknown) => {
+  const code = (error as { code?: string })?.code ?? "";
+  const messages: Record<string, string> = {
+    "auth/email-already-in-use": "An account with this email already exists.",
+    "auth/invalid-email": "Please enter a valid email address.",
+    "auth/weak-password": "Password must be at least 6 characters.",
+    "auth/invalid-credential": "Incorrect email or password.",
+    "auth/user-not-found": "Incorrect email or password.",
+    "auth/wrong-password": "Incorrect email or password.",
+    "auth/too-many-requests": "Too many attempts. Please try again later.",
+    "auth/operation-not-allowed": "Email/password sign-in is not enabled for this project.",
+  };
+  return messages[code] ?? "Something went wrong. Please try again.";
+};
 
 const Login = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleEmailLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+      toast.success("Successfully logged in!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error logging in with email", error);
+      toast.error(authErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleGoogleLogin = async () => {
     try {
@@ -85,12 +119,16 @@ const Login = () => {
               </div>
             </div>
 
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleEmailLogin}>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input 
                   id="email" 
                   type="email" 
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="designer@shaper.ai" 
                   className="bg-secondary border-input focus:border-primary/50 text-heading placeholder:text-muted-foreground"
                 />
@@ -104,12 +142,16 @@ const Login = () => {
                 <Input 
                   id="password" 
                   type="password" 
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="bg-secondary border-input focus:border-primary/50 text-heading"
                 />
               </div>
 
-              <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium py-6 rounded-xl text-base shadow-[0_0_20px_rgba(var(--primary),0.25)] hover:shadow-[0_0_30px_rgba(var(--primary),0.4)] transition-all duration-300">
-                Sign In
+              <Button type="submit" disabled={submitting} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium py-6 rounded-xl text-base shadow-[0_0_20px_rgba(var(--primary),0.25)] hover:shadow-[0_0_30px_rgba(var(--primary),0.4)] transition-all duration-300">
+                {submitting ? "Signing in..." : "Sign In"}
               </Button>
             </form>
           </div>

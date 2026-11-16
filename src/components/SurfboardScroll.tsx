@@ -142,6 +142,9 @@ const SurfboardScroll = () => {
         drawY = 0;
       }
 
+      // Frames are upscaled to the viewport; high-quality resampling keeps edges crisp.
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
       ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
     },
     [images]

@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { Feather, Target, Waves } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, Feather, Target, Waves } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const features = [
   {
@@ -105,6 +107,26 @@ const Features = () => {
               </motion.div>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mt-16 text-center"
+        >
+          <Button
+            asChild
+            size="lg"
+            className="px-8 py-6 rounded-xl text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(var(--primary),0.25)]"
+          >
+            <Link to="/create">
+              Create a Personalized Surf Board
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
+          </Button>
         </motion.div>
       </div>
     </section>

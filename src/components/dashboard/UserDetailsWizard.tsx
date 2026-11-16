@@ -4,8 +4,6 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import PersonalDetailsStep from "./wizard/PersonalDetailsStep";
-import SurfingPreferencesStep from "./wizard/SurfingPreferencesStep";
-import BoardSpecsStep from "./wizard/BoardSpecsStep";
 import MaterialsAestheticsStep from "./wizard/MaterialsAestheticsStep";
 import ReviewStep from "./wizard/ReviewStep";
 import { UserDetails, SurfboardSuggestion } from "@/types/userDetails";
@@ -21,21 +19,12 @@ interface UserDetailsWizardProps {
   ) => void | Promise<void>;
 }
 
+// "style" and "board-specs" are intentionally not shown to users: the AI infers them from the RAG knowledge base.
 const steps = [
   {
     id: "profile",
     title: "Surfer Profile",
     description: "Tell us about yourself",
-  },
-  {
-    id: "style",
-    title: "Style & Conditions",
-    description: "Your surfing preferences and home break",
-  },
-  {
-    id: "board-specs",
-    title: "Board Shape",
-    description: "Current board, outline, rocker, rails and contours",
   },
   {
     id: "materials",
@@ -189,10 +178,8 @@ export default function UserDetailsWizard({ onComplete }: UserDetailsWizardProps
                 }}
               >
                 {currentStep === 0 && <PersonalDetailsStep form={form} />}
-                {currentStep === 1 && <SurfingPreferencesStep form={form} />}
-                {currentStep === 2 && <BoardSpecsStep form={form} />}
-                {currentStep === 3 && <MaterialsAestheticsStep form={form} />}
-                {currentStep === 4 && <ReviewStep form={form} onComplete={handleComplete} />}
+                {currentStep === 1 && <MaterialsAestheticsStep form={form} />}
+                {currentStep === 2 && <ReviewStep form={form} onComplete={handleComplete} />}
               </motion.div>
             </AnimatePresence>
           </Form>

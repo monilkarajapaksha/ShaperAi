@@ -65,21 +65,6 @@ export default function ReviewStep({ form, onComplete }: ReviewStepProps) {
             <Row label="Board Type" value={data.board_type_preference && boardTypeName(data.board_type_preference)} />
           </div>
         </Card>
-
-        {/* Style & Conditions */}
-        <Card className="p-5 bg-secondary/20 border-border/50">
-          <div className="flex items-center gap-2 mb-4">
-            <Waves className="w-4 h-4 text-blue-400" />
-            <h3 className="font-semibold text-blue-400">Style &amp; Conditions</h3>
-          </div>
-          <div className="space-y-2 text-sm">
-            <Row label="Style" value={data.surfing_style?.replace("-", " ")} />
-            <Row label="Wave Types" value={waveTypes} />
-            <Row label="Board Feel" value={data.board_feel?.replace(/-/g, " ")} />
-            <Row label="Wave Size" value={data.wave_size} />
-            <Row label="Home Break" value={data.home_break} />
-          </div>
-        </Card>
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
