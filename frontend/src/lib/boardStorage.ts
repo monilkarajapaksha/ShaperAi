@@ -2,6 +2,7 @@ import {
   SavedSurfboard,
   UserDetails,
   SurfboardSuggestion,
+  BoardFeedback,
 } from "@/types/userDetails";
 import { BoardDesignInput, BoardTypeId, boardTypeName } from "@/types/boardDesign";
 
@@ -9,6 +10,7 @@ export interface BoardData {
   design: SavedSurfboard["design"];
   userDetails?: UserDetails;
   suggestion?: SurfboardSuggestion;
+  feedback?: BoardFeedback;
 }
 
 const STORAGE_KEY = "savedSurfboards";

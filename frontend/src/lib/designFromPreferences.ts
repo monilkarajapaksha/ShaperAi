@@ -1,4 +1,5 @@
 import { UserDetails, SurfboardSuggestion } from "@/types/userDetails";
+import { isFinAllowed, isTailAllowed } from "@/lib/boardRules";
 import { BoardDesignInput, BoardParams, BoardTypeId, boardTypeName } from "@/types/boardDesign";
 
 // Preset L × W × T in inches (mirrors the builder's TYPES table).
@@ -29,6 +30,10 @@ export function explicitBuilderChoices(ud: UserDetails): BoardDesignInput {
 /** Merge the surfer's explicit picks into an AI-generated design. */
 export function applyExplicitChoices(design: SurfboardSuggestion["design"], ud: UserDetails): SurfboardSuggestion["design"] {
   const picks = explicitBuilderChoices(ud);
+  // Never let a pick contradict the board type the design ended up with (e.g. a pin tail on a fish).
+  const p = picks.params as Partial<BoardParams>;
+  if (p.tailShape && !isTailAllowed(design.type, p.tailShape)) delete p.tailShape;
+  if (p.fins && !isFinAllowed(design.type, p.fins)) delete p.fins;
   return {
     ...design,
     units: picks.units ?? design.units,
@@ -54,16 +59,25 @@ function qualitativeParams(ud: UserDetails): Partial<BoardParams> {
   return Object.fromEntries(Object.entries(p).filter(([, v]) => v !== undefined));
 }
 
+const GOAL_TYPE: Record<string, BoardTypeId> = {
+  "easy-catching": "minimal", glide: "egg", "speed-flow": "hybrid", performance: "shortboard",
+};
+
 /** Rough local estimate used when the AI backend is unreachable. */
 export function fallbackSuggestion(ud: UserDetails): SurfboardSuggestion {
-  const bigWaves = ud.wave_size === "6-10ft" || ud.wave_size === "10+ft";
+  const big = ud.wave_size === "head-high-plus";
   const type: BoardTypeId =
     ud.board_type_preference ??
-    (ud.skill === "beginner" ? "softtop" : bigWaves ? "gun" : ud.skill === "intermediate" ? "hybrid" : "shortboard");
+    (ud.skill === "learning" ? "softtop"
+      : ud.skill === "green_waves" ? (ud.goal === "glide" ? "egg" : "minimal")
+      : big && ud.skill === "advanced" ? "gun"
+      : ud.goal === "performance" && ud.skill === "advanced" ? "shortboard"
+      : ud.skill === "advanced" && ud.wave_type === "soft" ? "groveler"
+      : GOAL_TYPE[ud.goal] === "shortboard" ? "hybrid" : GOAL_TYPE[ud.goal] ?? "hybrid");
 
   // Guild-factor volume target (liters per kg) by skill and fitness.
-  const guild = { beginner: 0.9, intermediate: 0.5, advanced: 0.4, pro: 0.36 }[ud.skill] ?? 0.5;
-  const fitness = { sedentary: 1.1, average: 1, athletic: 0.92 }[ud.fitness_level] ?? 1;
+  const guild = { learning: 0.9, green_waves: 0.6, linking_turns: 0.48, advanced: 0.4 }[ud.skill] ?? 0.5;
+  const fitness = { low: 1.1, average: 1, athletic: 0.92 }[ud.fitness_level] ?? 1;
   const target = (ud.weight_kg || 75) * guild * fitness;
 
   const [L, W, T] = PRESETS[type];
@@ -88,7 +102,7 @@ export function fallbackSuggestion(ud: UserDetails): SurfboardSuggestion {
     targetVolumeLiters: Math.round(target * 10) / 10,
     reasoning:
       `Offline estimate (AI shaper unavailable): a ${boardTypeName(type).toLowerCase()} sized for about ` +
-      `${Math.round(target)} L based on your ${ud.skill} skill, ${ud.fitness_level} fitness and ${ud.weight_kg} kg weight. ` +
+      `${Math.round(target)} L based on your skill, ${ud.fitness_level} fitness and ${ud.weight_kg} kg weight. ` +
       `Fine-tune it in the builder or ask the AI to refine it once the backend is reachable.`,
   };
 }

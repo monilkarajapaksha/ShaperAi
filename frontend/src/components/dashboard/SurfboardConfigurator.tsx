@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+import BoardFeedback from "@/components/dashboard/BoardFeedback";
 import BoardBuilder, { BoardBuilderHandle } from "@/components/builder/BoardBuilder";
 import { boardStorage, toStoredDesign } from "@/lib/boardStorage";
 import boardReconfigurationService from "@/services/boardReconfigurationService";
@@ -268,6 +269,7 @@ export default function SurfboardConfigurator({ boardId, isEditMode = false, onB
         onChange={setDesign}
         onSave={persist}
       />
+      {ready && board?.suggestion && <BoardFeedback board={board} />}
     </div>
   );
 }

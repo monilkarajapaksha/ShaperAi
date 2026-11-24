@@ -3,13 +3,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import PersonalDetailsStep from "./wizard/PersonalDetailsStep";
-import MaterialsAestheticsStep from "./wizard/MaterialsAestheticsStep";
+import SurferStep from "./wizard/SurferStep";
+import WavesGoalStep from "./wizard/WavesGoalStep";
+import CurrentBoardStep from "./wizard/CurrentBoardStep";
+import ExtrasStep from "./wizard/ExtrasStep";
 import ReviewStep from "./wizard/ReviewStep";
 import { UserDetails, SurfboardSuggestion } from "@/types/userDetails";
 import { useBoardConfiguration } from "@/hooks/use-board-configuration";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { toast } from "sonner";
+import { pruneInvalidPicks } from "@/lib/boardRules";
 import { applyExplicitChoices, fallbackSuggestion } from "@/lib/designFromPreferences";
 
 interface UserDetailsWizardProps {
@@ -19,43 +22,35 @@ interface UserDetailsWizardProps {
   ) => void | Promise<void>;
 }
 
-// "style" and "board-specs" are intentionally not shown to users: the AI infers them from the RAG knowledge base.
+// The surfer only describes themselves, the waves and the goal. The AI decides the shape.
 const steps = [
-  {
-    id: "profile",
-    title: "Surfer Profile",
-    description: "Tell us about yourself",
-  },
-  {
-    id: "materials",
-    title: "Fins & Finish",
-    description: "Fin setup, construction, colors and units",
-  },
-  {
-    id: "review",
-    title: "Review & Generate",
-    description: "Confirm details and generate your board",
-  },
+  { id: "surfer", title: "The Surfer", description: "Tell us about you" },
+  { id: "waves", title: "Waves & Goal", description: "Where you surf and what you want most" },
+  { id: "current", title: "Current Board", description: "Optional, but it tells the AI what to fix" },
+  { id: "extras", title: "Extras", description: "Board type, fins, colours. All optional" },
+  { id: "review", title: "Review & Generate", description: "Confirm and generate your board" },
 ];
+
+const SHAPER_ONLY_KEYS: (keyof UserDetails)[] = [
+  "age", "stance", "nose_shape", "tail_shape", "wide_point", "nose_rocker", "tail_rocker", "rail_profile",
+  "rail_edge", "deck_dome", "bottom_contour", "fin_size", "fin_placement", "stringer", "leash_plug",
+];
+
+const REQUIRED_BY_STEP: Record<number, (keyof UserDetails)[]> = {
+  0: ["height_cm", "weight_kg", "fitness_level", "skill", "surf_frequency"],
+  1: ["wave_size", "wave_type", "goal"],
+};
 
 export default function UserDetailsWizard({ onComplete }: UserDetailsWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const boardConfiguration = useBoardConfiguration();
   const form = useForm<UserDetails>({
-    defaultValues: {
-      fitness_level: "average",
-      skill: "intermediate",
-      surf_frequency: "weekly",
-      stance: "regular",
-    },
+    // Nothing required is pre-selected, so people answer instead of skipping.
+    defaultValues: { units: "imperial", shaper_mode: false },
   });
 
   const nextStep = async () => {
-    let fieldsToValidate: (keyof UserDetails)[] = [];
-
-    if (currentStep === 0) {
-      fieldsToValidate = ["height_cm", "weight_kg", "skill", "surf_frequency", "stance"];
-    }
+    const fieldsToValidate = REQUIRED_BY_STEP[currentStep] ?? [];
 
     const result =
       fieldsToValidate.length > 0
@@ -86,7 +81,12 @@ export default function UserDetailsWizard({ onComplete }: UserDetailsWizardProps
     }
   };
 
-  const handleComplete = async (data: UserDetails) => {
+  const handleComplete = async (raw: UserDetails) => {
+    // Drop shaper-mode picks that don't fit the chosen board type, and everything when shaper mode is off.
+    const data = { ...raw, ...pruneInvalidPicks(raw) };
+    if (!data.shaper_mode) {
+      for (const k of SHAPER_ONLY_KEYS) delete data[k];
+    }
     const suggestion = await generateSuggestion(data);
     onComplete(data, suggestion);
   };
@@ -177,9 +177,11 @@ export default function UserDetailsWizard({ onComplete }: UserDetailsWizardProps
                   opacity: { duration: 0.2 },
                 }}
               >
-                {currentStep === 0 && <PersonalDetailsStep form={form} />}
-                {currentStep === 1 && <MaterialsAestheticsStep form={form} />}
-                {currentStep === 2 && <ReviewStep form={form} onComplete={handleComplete} />}
+                {currentStep === 0 && <SurferStep form={form} />}
+                {currentStep === 1 && <WavesGoalStep form={form} />}
+                {currentStep === 2 && <CurrentBoardStep form={form} />}
+                {currentStep === 3 && <ExtrasStep form={form} />}
+                {currentStep === 4 && <ReviewStep form={form} onComplete={handleComplete} />}
               </motion.div>
             </AnimatePresence>
           </Form>
