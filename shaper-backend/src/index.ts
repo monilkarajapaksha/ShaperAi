@@ -32,6 +32,16 @@ const reconfigureBoardRequest = z.object({
   preference: z.string().trim().min(1).max(2000),
 });
 
+const feedbackRequest = z.object({
+  boardId: z.string().max(64).optional(),
+  boardType: z.string().max(32).optional(),
+  looksReal: z.boolean().optional(),
+  wouldRide: z.boolean().optional(),
+  problemAreas: z.array(z.enum(["nose", "tail", "rails", "fins", "bottom"])).max(5).optional(),
+  report: z.string().trim().max(1000).optional(),
+  context: z.record(z.unknown()).optional(),
+});
+
 // Routes
 app.get("/", (c) => c.text("ShaperAI API is running"));
 
@@ -46,6 +56,16 @@ app.get("/api/board-schema", (c) =>
     colors: { deck: BOARD_COLORS, bottom: BOARD_COLORS, fins: FIN_COLORS },
   }),
 );
+
+// Beta feedback. Logged as one structured line so it can be searched in Workers Logs / `wrangler tail`.
+app.post("/api/feedback", async (c) => {
+  const parsed = feedbackRequest.safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) {
+    return c.json({ error: "Invalid request", issues: parsed.error.issues }, 400);
+  }
+  console.log(JSON.stringify({ event: "board_feedback", at: new Date().toISOString(), ...parsed.data }));
+  return c.json({ ok: true });
+});
 
 app.post("/api/board-configuration", async (c) => {
   const parsed = boardConfigurationRequest.safeParse(await c.req.json().catch(() => null));

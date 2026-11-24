@@ -26,10 +26,12 @@ const FAMILY_BY_TYPE: Record<string, string[]> = {
 
 /** Rank models for the surfer: skill-level fit, board type preference, then keyword overlap with free text. */
 export function retrieveModels(details: Record<string, unknown>, limit = 3): Model[] {
-  const skill = LEVELS.indexOf(String(details.skill ?? ""));
+  const SKILL_LEVEL: Record<string, number> = { learning: 0, green_waves: 1, linking_turns: 1, advanced: 2 };
+  const raw = String(details.skill ?? "");
+  const skill = raw in SKILL_LEVEL ? SKILL_LEVEL[raw] : LEVELS.indexOf(raw);
   const families = FAMILY_BY_TYPE[String(details.board_type_preference ?? "")] ?? [];
   const words = String(
-    [details.additional_notes, details.current_board_feedback, details.home_break].filter(Boolean).join(" "),
+    [details.additional_notes, details.goal, details.wave_type, details.wave_size].filter(Boolean).join(" "),
   )
     .toLowerCase()
     .split(/\W+/)

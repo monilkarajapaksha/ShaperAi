@@ -14,6 +14,7 @@ import {
   normalizeParams,
   normalizeType,
 } from "./boardSchema";
+import { buildBrief, compatRulesForPrompt, sanitizeForType, shaperPicks } from "./compat";
 import { englishKnowledge, glossaryKnowledge, measurementContext, retrieveModels } from "./knowledge";
 
 const numericFields = Object.fromEntries(
@@ -38,6 +39,21 @@ const llmParamsSchema = z.object({
   stringer: z.boolean().optional().describe("Wood stringer on/off"),
   leashPlug: z.boolean().optional().describe("Leash plug on/off"),
 });
+
+/** LLMs occasionally emit invalid JSON (e.g. inch marks in the reasoning); retry instead of failing the request. */
+async function withRetry<T>(run: () => Promise<T>, attempts = 2): Promise<T> {
+  let last: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await run();
+    } catch (e) {
+      last = e;
+      if ((e as { lc_error_code?: string })?.lc_error_code !== "OUTPUT_PARSING_FAILURE") throw e;
+      console.warn(`LLM output failed to parse (attempt ${i + 1}/${attempts})`);
+    }
+  }
+  throw last;
+}
 
 const parser = new JsonMarkdownStructuredOutputParser(
   z.object({
@@ -81,6 +97,7 @@ Rules:
 - Use the current board dimensions (when provided) as a reference point.
 - Stay inside the listed ranges. Use only the listed enum values.
 - DO NOT add fields beyond the schema.
+- Inside the "reasoning" text NEVER use the double-quote character or backslashes. Write inches as "in" or with an apostrophe-free form like 7 ft 4 in (not 7'4").
 - Final answer MUST follow the format instructions exactly and be valid JSON ONLY — no prose before or after.
 
 Typical lengths: shortboard 5'6"–6'2" (66–74), groveler/fish 5'2"–5'9" (62–69), egg/hybrid 6'6"–8'0" (78–96),
@@ -93,8 +110,19 @@ ${englishKnowledge()}
 GLOSSARY
 ${glossaryKnowledge()}
 
-The surfer may not tell you their style, wave conditions or shape preferences. Infer them from skill, size, weight,
-fitness, frequency and notes, then pick the matching reference model above and choose all shape, rail, tail and fin params yourself.
+The surfer only describes themselves, their waves and ONE main goal; they never pick shape details. You decide every
+shape, rail, tail, bottom and fin param yourself, as a shaper would after a consultation.
+- The goal decides the character: easy-catching = volume, width, flatter rocker, full rails; glide = relaxed fuller outline, softer rails;
+  speed-flow = longer, drawn outline, moderate rocker, single or double concave, refined rails; performance = shorter, more rocker, pulled-in tail, harder rails.
+- Skill caps the performance: learners and green-wave surfers always get a forgiving, high-volume board even if they ask for performance.
+- Wave type: soft/mushy = flatter rocker, more area; punchy = medium rocker, quad/thruster, tail with some hold; fast/hollow = more rocker, hold, pulled-in tail, more length for steep waves.
+- If a current-board complaint is given, change exactly what fixes it.
+- Never produce contradictory shapes (e.g. a fish with hard rails and a pin tail). Keep every design a coherent, real surfboard.
+- If the surfer chose a board type or fin setup, use it exactly.
+- Shaper-mode picks (when given) are hard constraints; build the rest of the board around them.
+
+VALID TAILS AND FINS PER BOARD TYPE (never output a tail or fin setup outside the list for the chosen boardType):
+${compatRulesForPrompt()}
 Reference measurement ranges are provided with each request; stay inside them unless the surfer's body size clearly requires otherwise.
 
 PARAMETER REFERENCE
@@ -161,39 +189,37 @@ export const generateBoardDesign = async (
       "{system_prompt}",
       "Read the surfer's profile below and design their board.",
       "",
-      "SURFER PROFILE (JSON):",
-      "```",
-      "{requirements}",
-      "```",
+      "SURFER BRIEF:",
+      "{brief}",
+      "",
+      "SHAPER-MODE PICKS (hard constraints, may be empty):",
+      "{picks}",
       "",
       "CLOSEST REFERENCE MODELS (retrieved from the knowledge base; measurements in inches / litres):",
       "{reference_models}",
       "",
       "{format_instructions}",
     ].join("\n"),
-    inputVariables: ["requirements", "reference_models"],
+    inputVariables: ["brief", "picks", "reference_models"],
     partialVariables: {
       format_instructions: parser.getFormatInstructions(),
       system_prompt: systemPrompt,
     },
   });
 
-  const out = await prompt
+  const out = await withRetry(() => prompt
     .pipe(createModel(apiKey))
     .pipe(parser)
     .invoke({
-      requirements: JSON.stringify(userDetails),
+      brief: buildBrief((userDetails ?? {}) as Record<string, unknown>),
+      picks: JSON.stringify(shaperPicks((userDetails ?? {}) as Record<string, unknown>) ?? {}),
       reference_models: measurementContext(
         retrieveModels((userDetails ?? {}) as Record<string, unknown>),
       ),
-    });
+    }));
 
-  return toResult(
-    out,
-    normalizeType(out.boardType),
-    normalizeParams(out.params),
-    normalizeColors(out.colors),
-  );
+  const type = normalizeType(out.boardType);
+  return toResult(out, type, sanitizeForType(type, normalizeParams(out.params)), normalizeColors(out.colors));
 };
 
 /** Refine an existing builder design from a free-text request; unchanged params are carried over. */
@@ -233,13 +259,13 @@ export const refineBoardDesign = async (
     },
   });
 
-  const out = await prompt
+  const out = await withRetry(() => prompt
     .pipe(createModel(apiKey))
     .pipe(parser)
     .invoke({
       current_design: JSON.stringify(current),
       preference,
-    });
+    }));
 
   const type = normalizeType(out.boardType, normalizeType(current.type));
   const params = normalizeParams({
@@ -250,5 +276,5 @@ export const refineBoardDesign = async (
     ...normalizeColors(current.colors),
     ...normalizeColors(out.colors),
   };
-  return toResult(out, type, params, colors);
+  return toResult(out, type, sanitizeForType(type, params), colors);
 };
