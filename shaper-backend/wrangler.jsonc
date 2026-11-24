@@ -4,4 +4,14 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-01-20",
   "compatibility_flags": ["nodejs_compat"],
+  // Create with `npx wrangler d1 create shaper-feedback`, paste its id here, then
+  // `npx wrangler d1 migrations apply shaper-feedback --remote`.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "shaper-feedback",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
 }
