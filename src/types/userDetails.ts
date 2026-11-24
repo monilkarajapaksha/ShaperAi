@@ -9,36 +9,52 @@ import {
 } from "./boardDesign";
 import { BoardConfigurationResponse } from "./boardConfiguration";
 
+export type Fitness = "low" | "average" | "athletic";
+export type Skill = "learning" | "green_waves" | "linking_turns" | "advanced";
+export type Frequency = "occasionally" | "weekly" | "several_per_week";
+export type WaveSize = "knee-waist" | "waist-head" | "head-high-plus";
+export type WaveType = "soft" | "punchy" | "hollow";
+export type Goal = "easy-catching" | "glide" | "speed-flow" | "performance";
+export type Complaint = "hard-to-paddle" | "hard-to-catch" | "unstable" | "slow" | "stiff" | "too-loose";
+
+/**
+ * What the surfer tells us: who they are, the waves, the goal, their current board.
+ * Shape decisions (rocker, rails, dome, concave, fin size/cant…) are the AI's job;
+ * the optional fields at the bottom are only filled in "Shaper mode".
+ */
 export interface UserDetails {
-  // Section 1: Surfer Profile
+  // Step 1: The surfer (required)
   height_cm: number;
   weight_kg: number;
-  age?: number;
-  fitness_level: "sedentary" | "average" | "athletic";
-  skill: "beginner" | "intermediate" | "advanced" | "pro";
-  surf_frequency: "rarely" | "monthly" | "weekly" | "daily";
-  stance: "regular" | "goofy";
-  board_type_preference?: BoardTypeId;
+  fitness_level: Fitness;
+  skill: Skill;
+  surf_frequency: Frequency;
 
-  // Section 2: Surfing Style and Preferences
-  surfing_style?: "cruising" | "progressive" | "high-performance" | "big-wave" | "retro";
-  wave_type_preference?: string[];
-  board_feel?: "loose-playful" | "stable-forgiving" | "fast-responsive";
-  current_board_feedback?: string;
+  // Step 2: Waves and goal (required)
+  wave_size: WaveSize;
+  wave_type: WaveType;
+  /** One choice only, it replaces the old overlapping "style" and "feel" questions. */
+  goal: Goal;
 
-  // Section 3: Environmental Conditions
-  home_break?: string;
-  wave_size?: "0-2ft" | "2-4ft" | "4-6ft" | "6-10ft" | "10+ft";
-
-  // Section 4: Current Board Dimensions (reference, all optional)
-  current_length_ft?: number;
-  current_width_in?: number;
-  current_thickness_in?: number;
+  // Step 3: Current board (optional, high value)
+  current_length_in?: number;
   current_volume_l?: number;
-  current_nose_width_in?: number;
-  current_tail_width_in?: number;
+  current_board_complaint?: Complaint;
 
-  // Section 5: Board Shape Features (builder options)
+  // Step 4: Optional extras (undefined = "Let AI choose")
+  board_type_preference?: BoardTypeId;
+  fin_configuration?: FinSetup;
+  finish?: Finish;
+  deck_color?: string;
+  bottom_color?: string;
+  fin_color?: string;
+  units?: Units;
+  additional_notes?: string;
+
+  // Shaper mode (advanced, all optional; hidden for everyone else)
+  shaper_mode?: boolean;
+  age?: number;
+  stance?: "regular" | "goofy";
   nose_shape?: "pointed" | "medium" | "round";
   tail_shape?: TailShape;
   wide_point?: "back" | "centered" | "forward";
@@ -48,25 +64,10 @@ export interface UserDetails {
   rail_edge?: "soft" | "medium" | "hard";
   deck_dome?: "flat" | "moderate" | "domed";
   bottom_contour?: "flat" | "single-concave" | "double-concave" | "vee" | "channels";
-
-  // Section 6: Fin Setup (builder options)
-  fin_configuration?: FinSetup;
   fin_size?: "small" | "medium" | "large";
   fin_placement?: string;
-
-  // Section 7: Construction (builder options)
   stringer?: boolean;
   leash_plug?: boolean;
-  finish?: Finish;
-
-  // Section 8: Colors (builder swatches) and display units
-  deck_color?: string;
-  bottom_color?: string;
-  fin_color?: string;
-  units?: Units;
-
-  // Section 9: Additional Notes
-  additional_notes?: string;
 }
 
 /** AI result: the builder design plus the shaper's reasoning. */
@@ -85,5 +86,17 @@ export interface SavedSurfboard {
   design: Omit<BoardDesign, "computed"> & { computed?: BoardDesign["computed"] };
   userDetails?: UserDetails;
   suggestion?: SurfboardSuggestion;
+  feedback?: BoardFeedback;
   thumbnail?: string;
+}
+
+export type FeedbackArea = "nose" | "tail" | "rails" | "fins" | "bottom";
+
+/** Beta feedback collected after the AI board appears. */
+export interface BoardFeedback {
+  looksReal?: boolean;
+  wouldRide?: boolean;
+  problemAreas?: FeedbackArea[];
+  report?: string;
+  submittedAt: string;
 }
